@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>INXS — Tools & Services</title>
+  <meta name="description" content="A growing suite of tools and services. Fast, clean, built to get things done."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #08090d;
+      --bg2:       #0e0f17;
+      --bg3:       #13141f;
+      --border:    #1e2035;
+      --purple:    #7c3aed;
+      --purple2:   #9d5cf6;
+      --purple3:   #c4b5fd;
+      --purple-glow: rgba(124,58,237,0.18);
+      --text:      #e8eaf0;
+      --muted:     #7b80a0;
+      --faint:     #3a3f5c;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(8,9,13,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 30%, var(--purple2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--purple);
+      color: #fff !important;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      transition: background 0.2s, transform 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--purple2) !important;
+      transform: translateY(-1px);
+      color: #fff !important;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple3);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge span { font-size: 14px; }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 80px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      max-width: 820px;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--purple2), var(--purple3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 44px;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--purple2));
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(124,58,237,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124,58,237,0.45);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--faint);
+      background: var(--bg3);
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 64px;
+      padding: 60px 48px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-num {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff, var(--purple3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* ── SECTION ── */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--purple2);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    /* ── TOOLS GRID ── */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .tool-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(124,58,237,0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.12);
+    }
+
+    .tool-card:hover::before { opacity: 1; }
+
+    .tool-icon {
+      font-size: 32px;
+      width: 56px; height: 56px;
+      background: var(--bg3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+    }
+
+    .tool-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tool-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .tool-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .tool-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-live {
+      background: rgba(16,185,129,0.12);
+      color: #10b981;
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+
+    .badge-soon {
+      background: rgba(124,58,237,0.12);
+      color: var(--purple3);
+      border: 1px solid rgba(124,58,237,0.25);
+    }
+
+    /* ── COMING SOON CARD ── */
+    .tool-card.coming-soon {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .tool-card.coming-soon:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border);
+    }
+
+    /* ── FEATURE STRIP ── */
+    .features {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 40px;
+    }
+
+    .feature-item { display: flex; flex-direction: column; gap: 12px; }
+
+    .feature-icon {
+      font-size: 24px;
+      width: 48px; height: 48px;
+      background: var(--bg3);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+    }
+
+    .feature-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 48px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer strong {
+      background: linear-gradient(135deg, #fff 30%, var(--purple2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    footer .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    footer .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    footer .footer-links a:hover { color: var(--text); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .stats { gap: 32px; padding: 48px 24px; }
+    }
+
+    /* ── SCROLL ANIMATION ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">INXS</div>
+    <ul class="nav-links">
+      <li><a href="#tools">Tools</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="https://pdf.inxs.live" class="nav-cta">Try PDF Converter →</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge"><span>⚡</span> Tools that actually work</div>
+    <h1>Build faster.<br/><em>Work smarter.</em></h1>
+    <p class="hero-sub">A growing suite of clean, fast tools built to cut through the noise and get things done. No bloat. No nonsense.</p>
+    <div class="hero-actions">
+      <a href="#tools" class="btn-primary">Explore Tools →</a>
+      <a href="#about" class="btn-ghost">Learn More</a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-item fade-up">
+      <div class="stat-num">100MB</div>
+      <div class="stat-label">Max file size</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-num">&lt;60s</div>
+      <div class="stat-label">Avg conversion time</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-num">Free</div>
+      <div class="stat-label">Always</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Files stored</div>
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <section id="tools">
+    <div class="section-tag fade-up">Tools</div>
+    <h2 class="section-title fade-up">Everything in one place</h2>
+    <p class="section-sub fade-up">Each tool lives on its own subdomain. Clean, focused, fast. More dropping regularly.</p>
+
+    <div class="tools-grid">
+
+      <a href="https://pdf.inxs.live" class="tool-card fade-up">
+        <div class="tool-icon">📄</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="tool-name">PDF to Word</div>
+            <span class="tool-badge badge-live">Live</span>
+          </div>
+          <div class="tool-desc">Convert any PDF to a fully editable Microsoft Word .docx file. Fast, accurate, free. Up to 100MB.</div>
+        </div>
+        <div class="tool-link">Open tool <span>→</span></div>
+      </a>
+
+      <div class="tool-card coming-soon fade-up">
+        <div class="tool-icon">🖼️</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="tool-name">Image Converter</div>
+            <span class="tool-badge badge-soon">Coming Soon</span>
+          </div>
+          <div class="tool-desc">Convert between PNG, JPG, WEBP, HEIC and more. Batch processing supported.</div>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon fade-up">
+        <div class="tool-icon">📊</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="tool-name">CSV Tools</div>
+            <span class="tool-badge badge-soon">Coming Soon</span>
+          </div>
+          <div class="tool-desc">Clean, merge, convert and analyze CSV files right in your browser. No uploads needed.</div>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon fade-up">
+        <div class="tool-icon">🔗</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="tool-name">Link Shortener</div>
+            <span class="tool-badge badge-soon">Coming Soon</span>
+          </div>
+          <div class="tool-desc">Short, clean links on the inxs.live domain. Track clicks, set expiry, no account needed.</div>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon fade-up">
+        <div class="tool-icon">🔒</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="tool-name">File Encrypt</div>
+            <span class="tool-badge badge-soon">Coming Soon</span>
+          </div>
+          <div class="tool-desc">Password-protect and encrypt any file, client-side. Nothing ever leaves your browser.</div>
+        </div>
+      </div>
+
+      <div class="tool-card coming-soon fade-up">
+        <div class="tool-icon">✂️</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="tool-name">PDF Splitter</div>
+            <span class="tool-badge badge-soon">Coming Soon</span>
+          </div>
+          <div class="tool-desc">Split, merge, reorder or extract pages from PDFs. No software, no sign up required.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div class="features" id="about">
+    <div class="features-inner">
+      <div class="feature-item fade-up">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Fast by default</div>
+        <div class="feature-desc">No bloated frameworks. Every tool is built to load instantly and run without delay.</div>
+      </div>
+      <div class="feature-item fade-up">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Privacy first</div>
+        <div class="feature-desc">Files are never stored. Processed in memory and deleted immediately after download.</div>
+      </div>
+      <div class="feature-item fade-up">
+        <div class="feature-icon">🆓</div>
+        <div class="feature-title">Free forever</div>
+        <div class="feature-desc">No subscriptions, no accounts, no paywalls. Every tool on INXS is free to use.</div>
+      </div>
+      <div class="feature-item fade-up">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Works everywhere</div>
+        <div class="feature-desc">Fully responsive. Use any tool from your phone, tablet, or desktop — no app needed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>INXS</strong>
+    <p style="margin-top:8px;">Tools built to get things done.</p>
+    <div class="footer-links">
+      <a href="#tools">Tools</a>
+      <a href="https://pdf.inxs.live">PDF Converter</a>
+      <a href="mailto:hello@inxs.live">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    // Fade-up on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
