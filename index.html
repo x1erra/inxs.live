@@ -942,7 +942,13 @@
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // ── X Video Downloader logic ──
+    // ── X Video Downloader — 100% client-side via fxtwitter API ──
+    function parseTweetUrl(url) {
+      // Extract username + tweet ID from any x.com / twitter.com URL
+      const m = url.match(/(?:twitter\.com|x\.com)\/([\w]+)\/status\/(\d+)/i);
+      return m ? { username: m[1], id: m[2] } : null;
+    }
+
     async function handleDownload() {
       const urlInput = document.getElementById('xUrl');
       const btn      = document.getElementById('dlBtn');
@@ -954,42 +960,74 @@
 
       const url = urlInput.value.trim();
 
-      // Client-side validation
       if (!url) {
         showError(result, msg, link, 'Please paste an X post URL first.');
         return;
       }
 
-      const xPattern = /^https?:\/\/(www\.)?(twitter\.com|x\.com|t\.co)\//i;
-      if (!xPattern.test(url)) {
-        showError(result, msg, link, 'Please enter a valid X (twitter.com or x.com) URL.');
+      const parsed = parseTweetUrl(url);
+      if (!parsed) {
+        showError(result, msg, link, 'Please enter a valid X (x.com or twitter.com) post URL.');
         return;
       }
 
-      // Loading state
       btn.disabled = true;
       spinner.style.display = 'block';
-      btnText.textContent = 'Extracting video…';
-      result.className = 'dl-result';  // hide
+      btnText.textContent = 'Fetching video…';
+      result.className = 'dl-result';
 
       try {
-        const res = await fetch('/api/download', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url }),
-        });
-
+        const apiUrl = `https://api.fxtwitter.com/${parsed.username}/status/${parsed.id}`;
+        const res = await fetch(apiUrl);
         const data = await res.json();
 
-        if (data.url) {
-          // Success — show download link
-          result.className = 'dl-result success';
-          msg.textContent = '✅ Video ready!';
-          link.href = data.url;
-          link.style.display = 'inline-block';
-        } else {
-          showError(result, msg, link, data.error || 'Something went wrong. Please try again.');
+        const tweet = data.tweet;
+        if (!tweet) {
+          showError(result, msg, link, 'Could not find that post. Make sure the URL is correct.');
+          return;
         }
+
+        const media = tweet.media;
+        if (!media || !media.all || media.all.length === 0) {
+          showError(result, msg, link, 'No video found in that post.');
+          return;
+        }
+
+        // Find best quality MP4 from the media
+        let bestUrl = null;
+        let bestBitrate = 0;
+
+        for (const item of media.all) {
+          if (item.type !== 'video' && item.type !== 'animated_gif') continue;
+
+          // Use top-level URL first (already best quality)
+          if (item.url && item.url.includes('.mp4')) {
+            bestUrl = item.url;
+            break;
+          }
+
+          // Otherwise pick highest bitrate from formats
+          if (item.formats) {
+            for (const fmt of item.formats) {
+              if (fmt.container === 'mp4' && (fmt.bitrate || 0) > bestBitrate) {
+                bestBitrate = fmt.bitrate || 0;
+                bestUrl = fmt.url;
+              }
+            }
+          }
+        }
+
+        if (!bestUrl) {
+          showError(result, msg, link, 'Could not extract a downloadable video URL.');
+          return;
+        }
+
+        // Success
+        result.className = 'dl-result success';
+        msg.textContent = '✅ Video ready!';
+        link.href = bestUrl;
+        link.setAttribute('download', `${parsed.username}_${parsed.id}.mp4`);
+        link.style.display = 'inline-block';
 
       } catch (err) {
         showError(result, msg, link, 'Network error — please check your connection and try again.');
@@ -1006,7 +1044,6 @@
       link.style.display = 'none';
     }
 
-    // Allow Enter key in input
     document.getElementById('xUrl').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') handleDownload();
     });
