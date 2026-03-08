@@ -1,21 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
-    {
-      "src": "api/proxy.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "10mb" }
-    },
-    {
-      "src": "api/download.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
-    }
-  ],
   "routes": [
-    { "src": "/api/proxy", "dest": "/api/proxy.py" },
-    { "src": "/api/download", "dest": "/api/download.py" },
+    { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "functions": {
