@@ -1,13 +1,18 @@
 """
 Vercel Python Serverless Function — /api/download
-Uses yt-dlp as a Python library (not subprocess) to extract the direct
-CDN video URL from an X/Twitter post. Browser downloads straight from X.
+Uses fxtwitter.com API to extract the best video URL from an X/Twitter post.
+No external packages needed — pure stdlib urllib.
 """
 
 import json
 import re
+import urllib.request
+import urllib.error
 from http.server import BaseHTTPRequestHandler
 
+TWEET_RE = re.compile(
+    r'(?:twitter\.com|x\.com|t\.co)/([\w]+)/status/(\d+)', re.IGNORECASE
+)
 ALLOWED_DOMAINS = re.compile(
     r'^https?://(www\.)?(twitter\.com|x\.com|t\.co)/', re.IGNORECASE
 )
@@ -21,69 +26,60 @@ def is_valid_url(url: str) -> bool:
 
 
 def get_video_info(tweet_url: str) -> dict:
+    m = TWEET_RE.search(tweet_url)
+    if not m:
+        return {"error": "Could not parse tweet URL. Make sure it's a valid X post link."}
+
+    username, tweet_id = m.group(1), m.group(2)
+    api_url = f"https://api.fxtwitter.com/{username}/status/{tweet_id}"
+
     try:
-        import yt_dlp
+        req = urllib.request.Request(
+            api_url,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; inxs.live/1.0)"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return {"error": "Post not found. Make sure the URL is correct and the post is public."}
+        return {"error": f"Could not reach fxtwitter API (HTTP {e.code})."}
+    except Exception as e:
+        return {"error": "Network error fetching post data. Please try again."}
 
-        ydl_opts = {
-            'quiet': True,
-            'no_warnings': True,
-            'skip_download': True,
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'http_headers': {
-                'User-Agent': (
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                    'AppleWebKit/537.36 (KHTML, like Gecko) '
-                    'Chrome/122.0.0.0 Safari/537.36'
-                )
-            },
-        }
+    tweet = data.get("tweet") or data.get("data") or {}
+    media = tweet.get("media") or {}
+    all_media = media.get("all") or media.get("videos") or []
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(tweet_url, download=False)
+    if not all_media:
+        return {"error": "No video found in that post. Make sure it contains a video."}
 
-        if not info:
-            return {"error": "No video found in that post."}
+    best_url = None
+    best_bitrate = -1
+    title = tweet.get("author", {}).get("screen_name", "video") + "_" + tweet_id
 
-        # Grab the best direct URL
-        direct_url = None
-        title = info.get('title', 'video')
+    for item in all_media:
+        item_type = item.get("type", "")
+        if item_type not in ("video", "animated_gif", "gif"):
+            continue
 
-        if info.get('url'):
-            direct_url = info['url']
-        elif info.get('formats'):
-            # Pick best mp4 format
-            mp4_formats = [
-                f for f in info['formats']
-                if f.get('ext') == 'mp4' and f.get('url')
-            ]
-            if mp4_formats:
-                # Sort by resolution descending
-                mp4_formats.sort(
-                    key=lambda f: (f.get('height') or 0),
-                    reverse=True
-                )
-                direct_url = mp4_formats[0]['url']
-            else:
-                # Fallback: last format with a URL
-                for f in reversed(info['formats']):
-                    if f.get('url'):
-                        direct_url = f['url']
-                        break
+        # Top-level URL (already best quality in some responses)
+        if item.get("url") and ".mp4" in item.get("url", ""):
+            if best_url is None:
+                best_url = item["url"]
 
-        if not direct_url:
-            return {"error": "Could not extract a download URL from that post."}
+        # Check formats array for highest bitrate
+        for fmt in item.get("formats") or []:
+            if fmt.get("container") == "mp4" or ".mp4" in fmt.get("url", ""):
+                br = fmt.get("bitrate") or 0
+                if br > best_bitrate:
+                    best_bitrate = br
+                    best_url = fmt["url"]
 
-        return {"url": direct_url, "title": title}
+    if not best_url:
+        return {"error": "Could not extract a downloadable video URL from that post."}
 
-    except Exception as exc:
-        msg = str(exc)
-        if 'login' in msg.lower() or 'age' in msg.lower():
-            return {"error": "That video requires a login to access."}
-        if '429' in msg or 'rate limit' in msg.lower():
-            return {"error": "X is rate-limiting requests — try again in a moment."}
-        if 'No video' in msg or 'no formats' in msg.lower():
-            return {"error": "No downloadable video found in that post."}
-        return {"error": f"Could not extract video. Make sure the post contains a video."}
+    return {"url": best_url, "title": title}
 
 
 class handler(BaseHTTPRequestHandler):
