@@ -5,7 +5,7 @@ services:
     container_name: inxs-pdf-docs
     restart: unless-stopped
     ports:
-      - "127.0.0.1:18000:8000"
+      - "18000:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
       interval: 30s
@@ -19,7 +19,7 @@ services:
     container_name: inxs-video-converter
     restart: unless-stopped
     ports:
-      - "127.0.0.1:13000:3000"
+      - "13000:3000"
     volumes:
       - video_converter_downloads:/data/downloads
       - video_converter_uploads:/data/uploads
@@ -36,7 +36,7 @@ services:
     container_name: inxs-video-downloader
     restart: unless-stopped
     ports:
-      - "127.0.0.1:14000:4000"
+      - "14000:4000"
     volumes:
       - video_downloader_downloads:/data/downloads
     healthcheck:
@@ -53,8 +53,6 @@ services:
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       - pdf-docs
       - video-converter
