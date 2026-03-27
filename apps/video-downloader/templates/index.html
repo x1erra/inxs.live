@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INXS Video Downloader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-downloads-uri="{{ downloads_uri }}" data-downloads-path="{{ downloads_path }}">
+  <nav class="site-nav">
+    <a href="https://inxs.live" class="nav-logo">INXS</a>
+    <div class="nav-links">
+      <a href="https://inxs.live">Home</a>
+      <a href="https://pdf.inxs.live">PDF Tool</a>
+      <a href="https://convert.inxs.live">Converter</a>
+    </div>
+  </nav>
+
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">Download</div>
+      <h1>Pull video and audio from the web.</h1>
+      <p class="subtitle">Use `yt-dlp` through a clean INXS frontend. Best quality, MP4, or MP3 with live status and direct file delivery.</p>
+    </section>
+
+    <section class="grid">
+      <div class="card main-card">
+        <div class="card-header">
+          <div>
+            <div class="card-kicker">Video Downloader</div>
+            <h2>Start a download job</h2>
+          </div>
+          <div class="chip">Live</div>
+        </div>
+
+        <label for="urlInput">Video URL</label>
+        <input id="urlInput" type="url" placeholder="https://youtube.com/... or https://x.com/..." autocomplete="off" />
+
+        <div class="row controls-row">
+          <div class="field">
+            <label for="formatSelect">Output</label>
+            <select id="formatSelect">
+              <option value="best_quality">Best Quality</option>
+              <option value="mp4">MP4</option>
+              <option value="mp3">MP3</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button id="downloadBtn">Start Download</button>
+            {% if open_downloads_enabled %}
+            <button id="openFolderBtn" class="secondary">Open Downloads</button>
+            {% endif %}
+          </div>
+        </div>
+
+        <p id="statusText" class="status">Idle</p>
+        <div class="progress-wrap" aria-label="Download progress">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="metaText" class="meta"></p>
+        <p id="pathText" class="meta"></p>
+        <p id="fileLinkWrap" class="meta file-link"></p>
+      </div>
+
+      <aside class="card side-card">
+        <div class="card-kicker">How It Works</div>
+        <h2>One input. Three formats.</h2>
+        <ul class="feature-list">
+          <li><strong>Best Quality:</strong> pulls the best available combined output.</li>
+          <li><strong>MP4:</strong> prioritizes broadly compatible video output.</li>
+          <li><strong>MP3:</strong> extracts audio when `ffmpeg` is available.</li>
+        </ul>
+        <p class="footnote">Files are written to <code>{{ downloads_path }}</code> inside the running service environment.</p>
+      </aside>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

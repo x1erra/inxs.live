@@ -1,0 +1,71 @@
+services:
+  caddy:
+    image: caddy:2.10
+    container_name: inxs-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ..:/srv/site:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - pdf-docs
+      - video-converter
+      - video-downloader
+
+  pdf-docs:
+    build:
+      context: ../apps/pdf-docs
+    container_name: inxs-pdf-docs
+    restart: unless-stopped
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  video-converter:
+    build:
+      context: ../apps/video-converter
+    container_name: inxs-video-converter
+    restart: unless-stopped
+    expose:
+      - "3000"
+    volumes:
+      - video_converter_downloads:/data/downloads
+      - video_converter_uploads:/data/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3000/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  video-downloader:
+    build:
+      context: ../apps/video-downloader
+    container_name: inxs-video-downloader
+    restart: unless-stopped
+    expose:
+      - "4000"
+    volumes:
+      - video_downloader_downloads:/data/downloads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  caddy_data:
+  caddy_config:
+  video_converter_downloads:
+  video_converter_uploads:
+  video_downloader_downloads:

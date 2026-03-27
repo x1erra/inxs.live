@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INXS Video Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #08090d;
+      --bg-2: #0e0f17;
+      --bg-3: #141625;
+      --panel: rgba(14, 15, 23, 0.9);
+      --panel-strong: rgba(20, 22, 37, 0.98);
+      --border: #23263a;
+      --text: #edf0f7;
+      --muted: #9197b3;
+      --faint: #606684;
+      --accent: #7c3aed;
+      --accent-2: #9d5cf6;
+      --success: #10b981;
+      --danger: #f87171;
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.32);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(124, 58, 237, 0.22), transparent 30%),
+        radial-gradient(circle at 90% 0%, rgba(44, 63, 173, 0.2), transparent 24%),
+        linear-gradient(180deg, #07080c 0%, var(--bg) 100%);
+    }
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      background: rgba(8, 9, 13, 0.84);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      font-size: 1.2rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 18px;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .shell {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 72px;
+    }
+    .hero {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .eyebrow, .card-kicker, .chip {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .eyebrow, .card-kicker { color: var(--accent-2); }
+    .hero h1, .card h2 { margin: 0; letter-spacing: -0.04em; }
+    .hero h1 {
+      max-width: 780px;
+      font-size: clamp(2.3rem, 6vw, 4.8rem);
+      line-height: 0.98;
+    }
+    .subtitle, .meta, .panel-text, .hint { color: var(--muted); }
+    .subtitle {
+      max-width: 760px;
+      line-height: 1.7;
+      margin: 0;
+      font-size: 1rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
+      gap: 20px;
+    }
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-strong));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .chip {
+      color: #d8ccff;
+      background: rgba(124, 58, 237, 0.14);
+      border: 1px solid rgba(124, 58, 237, 0.35);
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+    .dropzone {
+      border: 1px dashed rgba(157, 92, 246, 0.45);
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      background: rgba(20, 22, 37, 0.76);
+      color: var(--muted);
+      margin-bottom: 16px;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+    .dropzone.active {
+      border-color: rgba(196, 181, 253, 0.7);
+      background: rgba(124, 58, 237, 0.14);
+      transform: translateY(-1px);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 150px 150px 180px;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    input[type="file"], select, button {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      font-size: 0.98rem;
+      background: var(--bg-3);
+      color: var(--text);
+      font-family: inherit;
+    }
+    select:focus, input[type="file"]:focus {
+      outline: none;
+      border-color: rgba(124, 58, 237, 0.55);
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+    }
+    button {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 28px rgba(124, 58, 237, 0.28);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .secondary { background: #23263a; box-shadow: none; }
+    .progress {
+      margin-top: 16px;
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: #1c1f31;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #c4b5fd);
+      transition: width 0.2s linear;
+    }
+    .meta {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      word-break: break-word;
+      min-height: 22px;
+      line-height: 1.6;
+    }
+    .ok { color: var(--success); }
+    .err { color: var(--danger); }
+    .actions { margin-top: 16px; }
+    .download-list {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+    .download-list a {
+      color: #d8ccff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .jobs {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(8, 9, 13, 0.45);
+    }
+    .jobs table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .jobs th, .jobs td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    .jobs th { background: rgba(20, 22, 37, 0.86); color: #c9ceea; }
+    .jobs tr:last-child td { border-bottom: none; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .feature-list {
+      margin: 18px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .feature-list strong { color: var(--text); }
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .row { grid-template-columns: 1fr; }
+      .jobs { overflow-x: auto; }
+      .jobs table { min-width: 620px; }
+    }
+    @media (max-width: 640px) {
+      .site-nav, .shell { width: calc(100% - 24px); }
+      .site-nav { padding: 16px 0; }
+      .nav-links { display: none; }
+      .card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="https://inxs.live" class="nav-logo">INXS</a>
+    <div class="nav-links">
+      <a href="https://inxs.live">Home</a>
+      <a href="https://pdf.inxs.live">PDF Tool</a>
+      <a href="https://download.inxs.live">Downloader</a>
+    </div>
+  </nav>
+
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">Convert</div>
+      <h1>Transcode video without leaving the browser.</h1>
+      <p class="subtitle">Batch uploads, format switches, quality presets, platform presets, progress tracking, and cancellation in one INXS interface.</p>
+    </section>
+
+    <section class="layout">
+      <main class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-kicker">Video Converter</div>
+            <h2>Queue conversion jobs</h2>
+          </div>
+          <div class="chip">FFmpeg</div>
+        </div>
+
+        <form id="convertForm">
+          <div id="dropzone" class="dropzone">Drop video files here or use the picker below</div>
+          <div class="row">
+            <input id="fileInput" type="file" accept="video/*" multiple required />
+            <select id="outputFormat" required>
+              {% for fmt in formats %}
+              <option value="{{ fmt }}">{{ fmt|upper }}</option>
+              {% endfor %}
+            </select>
+            <select id="qualityPreset" required>
+              {% for q in quality_presets %}
+              <option value="{{ q }}">{{ q|capitalize }}</option>
+              {% endfor %}
+            </select>
+            <select id="platformPreset" required>
+              {% for key, config in platform_presets.items() %}
+              <option value="{{ key }}">{{ config.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button id="convertBtn" type="submit">Convert Selected Files</button>
+          <button id="cancelBtn" class="secondary" type="button" style="margin-top:10px;" disabled>Cancel In Progress</button>
+        </form>
+
+        <div class="progress" aria-label="Progress">
+          <span id="progressFill"></span>
+        </div>
+        <div id="status" class="meta">Select or drop video files to begin.</div>
+        <div id="eta" class="meta"></div>
+        <div id="picked" class="meta"></div>
+        <div class="jobs" id="jobsWrap" style="display:none;">
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>ETA</th>
+              </tr>
+            </thead>
+            <tbody id="jobsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="actions" id="downloadWrap" style="display:none;">
+          <div class="meta ok">Converted files:</div>
+          <ul id="downloadList" class="download-list"></ul>
+        </div>
+      </main>
+
+      <aside class="card">
+        <div class="card-kicker">Presets</div>
+        <h2>Built for common outputs</h2>
+        <p class="panel-text">Leave everything custom, or switch to a delivery preset that forces MP4 and targets a destination profile.</p>
+        <ul class="feature-list">
+          <li><strong>YouTube 1080p:</strong> padded 1080p output with H.264 and AAC.</li>
+          <li><strong>Instagram:</strong> social-friendly dimensions and bitrate.</li>
+          <li><strong>WhatsApp:</strong> compact output tuned for messaging.</li>
+          <li><strong>Batch mode:</strong> process multiple files in one queue.</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('convertForm');
+    const fileInput = document.getElementById('fileInput');
+    const outputFormat = document.getElementById('outputFormat');
+    const qualityPreset = document.getElementById('qualityPreset');
+    const platformPreset = document.getElementById('platformPreset');
+    const progressFill = document.getElementById('progressFill');
+    const statusEl = document.getElementById('status');
+    const etaEl = document.getElementById('eta');
+    const pickedEl = document.getElementById('picked');
+    const convertBtn = document.getElementById('convertBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const downloadWrap = document.getElementById('downloadWrap');
+    const downloadList = document.getElementById('downloadList');
+    const dropzone = document.getElementById('dropzone');
+    const jobsWrap = document.getElementById('jobsWrap');
+    const jobsBody = document.getElementById('jobsBody');
+
+    let selectedFiles = [];
+    let activeJobId = null;
+    let batchCancelled = false;
+    let batchStartedAt = 0;
+
+    const setProgress = (value) => {
+      const pct = Math.max(0, Math.min(100, Number(value) || 0));
+      progressFill.style.width = pct + '%';
+    };
+
+    const formatDuration = (totalSeconds) => {
+      const s = Math.max(0, Math.floor(totalSeconds));
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      if (h > 0) return `${h}h ${m}m ${sec}s`;
+      if (m > 0) return `${m}m ${sec}s`;
+      return `${sec}s`;
+    };
+
+    const updateBatchEta = (overallPct) => {
+      if (!batchStartedAt || overallPct <= 0 || overallPct >= 100) {
+        etaEl.textContent = '';
+        return;
+      }
+      const elapsed = (Date.now() - batchStartedAt) / 1000;
+      const totalEstimate = elapsed / (overallPct / 100);
+      const etaSec = totalEstimate - elapsed;
+      etaEl.textContent = `Estimated time remaining: ${formatDuration(etaSec)}`;
+    };
+
+    const renderPickedFiles = () => {
+      if (!selectedFiles.length) {
+        pickedEl.textContent = '';
+        return;
+      }
+      pickedEl.textContent = `${selectedFiles.length} file(s) selected: ${selectedFiles.map((f) => f.name).join(', ')}`;
+    };
+
+    const renderJobsTable = () => {
+      jobsBody.innerHTML = '';
+      if (!selectedFiles.length) {
+        jobsWrap.style.display = 'none';
+        return;
+      }
+
+      jobsWrap.style.display = 'block';
+      for (let i = 0; i < selectedFiles.length; i += 1) {
+        const tr = document.createElement('tr');
+        tr.id = `job-row-${i}`;
+        tr.innerHTML = `
+          <td class="mono">${selectedFiles[i].name}</td>
+          <td id="job-status-${i}">queued</td>
+          <td id="job-progress-${i}">0%</td>
+          <td id="job-eta-${i}">-</td>
+        `;
+        jobsBody.appendChild(tr);
+      }
+    };
+
+    const setJobRow = (idx, status, progress, eta = '-') => {
+      const statusCell = document.getElementById(`job-status-${idx}`);
+      const progressCell = document.getElementById(`job-progress-${idx}`);
+      const etaCell = document.getElementById(`job-eta-${idx}`);
+      if (statusCell) statusCell.textContent = status;
+      if (progressCell) progressCell.textContent = `${Math.round(Number(progress) || 0)}%`;
+      if (etaCell) etaCell.textContent = eta;
+    };
+
+    const resetUi = () => {
+      downloadWrap.style.display = 'none';
+      downloadList.innerHTML = '';
+      setProgress(0);
+      etaEl.textContent = '';
+      statusEl.className = 'meta';
+    };
+
+    const pollJob = async (jobId, idx, batchIndex, totalFiles) => {
+      const started = Date.now();
+      return new Promise((resolve) => {
+        const timer = setInterval(async () => {
+          try {
+            const resp = await fetch(`/api/progress/${jobId}`);
+            const data = await resp.json();
+            if (!resp.ok) throw new Error(data.error || 'Job failed');
+
+            const progress = Number(data.progress || 0);
+            const elapsedSec = (Date.now() - started) / 1000;
+            const jobEta = progress > 0 && progress < 100
+              ? formatDuration((elapsedSec / (progress / 100)) - elapsedSec)
+              : '-';
+
+            setJobRow(idx, data.status || 'running', progress, jobEta);
+            const overall = ((batchIndex + (progress / 100)) / totalFiles) * 100;
+            setProgress(overall);
+            updateBatchEta(overall);
+            statusEl.textContent = data.message || data.status || 'Running';
+
+            if (data.status === 'done') {
+              clearInterval(timer);
+              setJobRow(idx, 'done', 100, '0s');
+              resolve({ ok: true, data });
+            } else if (data.status === 'error' || data.status === 'cancelled') {
+              clearInterval(timer);
+              resolve({ ok: false, data });
+            }
+          } catch (err) {
+            clearInterval(timer);
+            resolve({ ok: false, data: { message: err.message || 'Polling failed', status: 'error' } });
+          }
+        }, 900);
+      });
+    };
+
+    const uploadAndConvert = async (file, idx, totalFiles) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('output_format', outputFormat.value);
+      fd.append('quality_preset', qualityPreset.value);
+      fd.append('platform_preset', platformPreset.value);
+
+      setJobRow(idx, 'uploading', 0, '-');
+      const resp = await fetch('/api/convert', { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || 'Could not start conversion');
+
+      activeJobId = data.job_id;
+      return pollJob(data.job_id, idx, idx, totalFiles);
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!selectedFiles.length) {
+        statusEl.textContent = 'Select at least one video file.';
+        return;
+      }
+
+      batchCancelled = false;
+      batchStartedAt = Date.now();
+      convertBtn.disabled = true;
+      cancelBtn.disabled = false;
+      resetUi();
+      renderJobsTable();
+
+      for (let i = 0; i < selectedFiles.length; i += 1) {
+        if (batchCancelled) break;
+        try {
+          const result = await uploadAndConvert(selectedFiles[i], i, selectedFiles.length);
+          if (!result.ok) {
+            setJobRow(i, result.data.status || 'error', result.data.progress || 0, '-');
+            statusEl.textContent = result.data.message || 'Conversion failed';
+            statusEl.className = 'meta err';
+            if (result.data.status === 'cancelled') {
+              batchCancelled = true;
+              break;
+            }
+          } else {
+            const item = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `/api/download/${activeJobId}`;
+            link.textContent = result.data.output_name || selectedFiles[i].name;
+            item.appendChild(link);
+            downloadList.appendChild(item);
+            downloadWrap.style.display = 'block';
+            statusEl.textContent = result.data.message || 'Conversion complete';
+            statusEl.className = 'meta ok';
+          }
+        } catch (err) {
+          setJobRow(i, 'error', 0, '-');
+          statusEl.textContent = err.message;
+          statusEl.className = 'meta err';
+        }
+      }
+
+      if (batchCancelled) {
+        statusEl.textContent = 'Batch cancelled';
+        statusEl.className = 'meta err';
+      }
+
+      activeJobId = null;
+      convertBtn.disabled = false;
+      cancelBtn.disabled = true;
+      updateBatchEta(100);
+    });
+
+    cancelBtn.addEventListener('click', async () => {
+      batchCancelled = true;
+      cancelBtn.disabled = true;
+      if (!activeJobId) return;
+      try {
+        await fetch(`/api/cancel/${activeJobId}`, { method: 'POST' });
+      } catch (err) {
+        statusEl.textContent = err.message;
+        statusEl.className = 'meta err';
+      }
+    });
+
+    const setSelectedFiles = (files) => {
+      selectedFiles = Array.from(files || []).filter((file) => file.type.startsWith('video/') || file.name.includes('.'));
+      renderPickedFiles();
+      renderJobsTable();
+      statusEl.textContent = selectedFiles.length ? 'Ready to convert.' : 'Select or drop video files to begin.';
+      statusEl.className = 'meta';
+    };
+
+    fileInput.addEventListener('change', (e) => setSelectedFiles(e.target.files));
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('active');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('active');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('active');
+      const files = e.dataTransfer.files;
+      fileInput.files = files;
+      setSelectedFiles(files);
+    });
+
+    platformPreset.addEventListener('change', () => {
+      if (platformPreset.value !== 'none') {
+        outputFormat.value = 'mp4';
+      }
+    });
+  </script>
+</body>
+</html>

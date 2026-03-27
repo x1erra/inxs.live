@@ -1,13 +1,22 @@
 # inxs.live
 
-Landing page for [inxs.live](https://inxs.live) — a growing suite of free tools and services.
+Self-contained monorepo for the `inxs.live` landing page and its deployable tool stack.
 
-## Tools
+## Repo structure
 
-- **PDF to Word** — Convert PDFs to editable .docx files (live at [pdf.inxs.live](https://pdf.inxs.live))
-- More coming soon
+- `index.html` -> public homepage
+- `apps/pdf-docs` -> PDF/DOCX converter
+- `apps/video-converter` -> video conversion app
+- `apps/video-downloader` -> media downloader
+- `deploy` -> Caddy + Docker Compose for Portainer/Umbrel
 
-## Stack
+## Live endpoints
 
-- Plain HTML/CSS/JS — no frameworks, no bloat
-- Hosted on Vercel
+- `https://inxs.live`
+- `https://pdf.inxs.live`
+- `https://convert.inxs.live`
+- `https://download.inxs.live`
+
+## Deployment
+
+Use [deploy/docker-compose.yml](/home/damato/Projects/INXS-Live/deploy/docker-compose.yml) as the Portainer stack file from this repo.

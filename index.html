@@ -367,7 +367,7 @@
       border-color: var(--border);
     }
 
-    /* ── X VIDEO DOWNLOADER SECTION ── */
+    /* ── MEDIA TOOLS SECTION ── */
     .downloader-section {
       background: var(--bg2);
       border-top: 1px solid var(--border);
@@ -423,7 +423,12 @@
 
     .step-text strong { color: var(--text); }
 
-    /* ── DOWNLOADER WIDGET ── */
+    /* ── TOOL LAUNCH CARDS ── */
+    .launch-grid {
+      display: grid;
+      gap: 18px;
+    }
+
     .downloader-widget {
       background: var(--bg3);
       border: 1px solid var(--border);
@@ -471,29 +476,31 @@
       margin-top: 2px;
     }
 
-    .url-input-wrap {
-      position: relative;
-      margin-bottom: 14px;
-    }
-
-    .url-input {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
+    .launch-card p {
       font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 18px;
     }
 
-    .url-input::placeholder { color: var(--faint); }
+    .launch-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
 
-    .url-input:focus {
-      border-color: rgba(124,58,237,0.5);
-      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    .launch-list li {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .launch-list strong {
+      color: var(--text);
+      font-weight: 700;
     }
 
     .dl-btn {
@@ -515,75 +522,16 @@
       gap: 8px;
     }
 
-    .dl-btn:hover:not(:disabled) {
+    .dl-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 28px rgba(124,58,237,0.45);
     }
 
-    .dl-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* spinner */
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* result / error states */
-    .dl-result {
-      margin-top: 16px;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 13px;
-      display: none;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .dl-result.success {
-      background: rgba(16,185,129,0.08);
-      border: 1px solid rgba(16,185,129,0.25);
-      color: #10b981;
-      display: flex;
-    }
-
-    .dl-result.error {
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.25);
-      color: #f87171;
-      display: flex;
-    }
-
-    .dl-result a {
-      color: #10b981;
-      font-weight: 700;
-      text-decoration: none;
-      margin-left: auto;
-      white-space: nowrap;
-      border: 1px solid rgba(16,185,129,0.35);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      transition: background 0.2s;
-    }
-
-    .dl-result a:hover { background: rgba(16,185,129,0.12); }
-
     .privacy-note {
-      margin-top: 14px;
-      font-size: 11.5px;
+      margin-top: 18px;
+      font-size: 12px;
       color: var(--faint);
-      text-align: center;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     /* ── FEATURE STRIP ── */
@@ -692,9 +640,9 @@
     <div class="nav-logo">INXS</div>
     <ul class="nav-links">
       <li><a href="#tools">Tools</a></li>
-      <li><a href="#downloader">X Downloader</a></li>
+      <li><a href="#downloader">Media Tools</a></li>
       <li><a href="#about">About</a></li>
-      <li><a href="https://pdf.inxs.live" class="nav-cta">Try PDF Converter →</a></li>
+      <li><a href="https://download.inxs.live" class="nav-cta">Launch Downloader →</a></li>
     </ul>
   </nav>
 
@@ -702,30 +650,30 @@
   <div class="hero">
     <div class="hero-badge"><span>⚡</span> Tools that actually work</div>
     <h1>Build faster.<br/><em>Work smarter.</em></h1>
-    <p class="hero-sub">A growing suite of clean, fast tools built to cut through the noise and get things done. No bloat. No nonsense.</p>
+    <p class="hero-sub">A growing suite of clean, fast tools for documents and media. Built to do the work without the friction.</p>
     <div class="hero-actions">
       <a href="#tools" class="btn-primary">Explore Tools →</a>
-      <a href="#downloader" class="btn-ghost">X Video Downloader</a>
+      <a href="#downloader" class="btn-ghost">Media Stack</a>
     </div>
   </div>
 
   <!-- STATS -->
   <div class="stats">
     <div class="stat-item fade-up">
-      <div class="stat-num">100MB</div>
-      <div class="stat-label">Max file size</div>
+      <div class="stat-num">3</div>
+      <div class="stat-label">Live tools</div>
     </div>
     <div class="stat-item fade-up">
       <div class="stat-num">&lt;60s</div>
-      <div class="stat-label">Avg conversion time</div>
+      <div class="stat-label">Typical jobs</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Self-hosted uptime</div>
     </div>
     <div class="stat-item fade-up">
       <div class="stat-num">Free</div>
       <div class="stat-label">Always</div>
-    </div>
-    <div class="stat-item fade-up">
-      <div class="stat-num">0</div>
-      <div class="stat-label">Files stored</div>
     </div>
   </div>
 
@@ -733,7 +681,7 @@
   <section id="tools">
     <div class="section-tag fade-up">Tools</div>
     <h2 class="section-title fade-up">Everything in one place</h2>
-    <p class="section-sub fade-up">Each tool is fast, focused, and free. More dropping regularly.</p>
+    <p class="section-sub fade-up">Three production-ready tools are now part of the INXS stack, with more to follow.</p>
 
     <div class="tools-grid">
 
@@ -741,38 +689,37 @@
         <div class="tool-icon">📄</div>
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <div class="tool-name">PDF to Word</div>
+            <div class="tool-name">PDF and DOCX Converter</div>
             <span class="tool-badge badge-live">Live</span>
           </div>
-          <div class="tool-desc">Convert any PDF to a fully editable Microsoft Word .docx file. Fast, accurate, free. Up to 100MB.</div>
+          <div class="tool-desc">Convert PDF to DOCX and DOCX back to PDF from one simple interface, powered by `pdf2docx` and LibreOffice.</div>
         </div>
         <div class="tool-link">Open tool <span>→</span></div>
       </a>
 
-      <!-- X VIDEO DOWNLOADER CARD -->
-      <a href="#downloader" class="tool-card fade-up">
-        <div class="tool-icon">🐦</div>
+      <a href="https://download.inxs.live" class="tool-card fade-up">
+        <div class="tool-icon">⬇️</div>
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <div class="tool-name">X Video Downloader</div>
-            <span class="tool-badge badge-new">New</span>
+            <div class="tool-name">Video Downloader</div>
             <span class="tool-badge badge-live">Live</span>
           </div>
-          <div class="tool-desc">Download any video from X (Twitter) in seconds. Paste the post URL and get the file — no login, no app.</div>
+          <div class="tool-desc">Download videos and audio from YouTube, X/Twitter, and other `yt-dlp` supported sources in best quality, MP4, or MP3.</div>
         </div>
-        <div class="tool-link">Use now <span>↓</span></div>
+        <div class="tool-link">Start download <span>→</span></div>
       </a>
 
-      <div class="tool-card coming-soon fade-up">
-        <div class="tool-icon">🖼️</div>
+      <a href="https://convert.inxs.live" class="tool-card fade-up">
+        <div class="tool-icon">🎬</div>
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <div class="tool-name">Image Converter</div>
-            <span class="tool-badge badge-soon">Coming Soon</span>
+            <div class="tool-name">Video Converter</div>
+            <span class="tool-badge badge-live">Live</span>
           </div>
-          <div class="tool-desc">Convert between PNG, JPG, WEBP, HEIC and more. Batch processing supported.</div>
+          <div class="tool-desc">Upload one or more files, choose output format and quality preset, and run FFmpeg-powered conversions in the browser.</div>
         </div>
-      </div>
+        <div class="tool-link">Convert files <span>→</span></div>
+      </a>
 
       <div class="tool-card coming-soon fade-up">
         <div class="tool-icon">📊</div>
@@ -811,80 +758,78 @@
   </section>
 
   <!-- ══════════════════════════════════════════
-       X VIDEO DOWNLOADER SECTION
+       MEDIA TOOLS SECTION
        ══════════════════════════════════════════ -->
   <div class="downloader-section" id="downloader">
     <div class="downloader-inner">
 
-      <!-- Left: copy -->
       <div class="downloader-copy fade-up">
-        <div class="section-tag">X Video Downloader</div>
-        <h2 class="section-title">Save any X video<br/>in seconds.</h2>
+        <div class="section-tag">Media Stack</div>
+        <h2 class="section-title">Documents in.<br/>Media out.</h2>
         <p class="section-sub">
-          Paste the URL of any post on X (formerly Twitter) that contains a video
-          and we'll grab the highest-quality version for you to download directly.
-          No login. No app. No stored files.
+          INXS now bundles document conversion, media downloading, and format conversion into one stack.
+          The homepage stays simple, while the heavy lifting runs on dedicated services behind the same brand.
         </p>
 
         <div class="downloader-steps">
           <div class="downloader-step">
             <div class="step-num">1</div>
             <div class="step-text">
-              <strong>Copy the post URL</strong> — tap the share icon on any X post and
-              hit "Copy link."
+              <strong>Launch the right tool</strong> from the INXS homepage without jumping between unrelated apps or repos.
             </div>
           </div>
           <div class="downloader-step">
             <div class="step-num">2</div>
             <div class="step-text">
-              <strong>Paste it below</strong> and click Download. We extract the
-              highest-quality MP4 directly from X's servers.
+              <strong>Process files on demand</strong> using isolated backend containers for each workload: documents, downloads, and transcoding.
             </div>
           </div>
           <div class="downloader-step">
             <div class="step-num">3</div>
             <div class="step-text">
-              <strong>Your browser downloads</strong> the file straight from X's CDN —
-              nothing passes through or is stored on our servers.
+              <strong>Keep it online 24/7</strong> with Caddy, Docker volumes, and Portainer-managed restarts on the Umbrel Pi.
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right: widget -->
-      <div class="downloader-widget fade-up">
-        <div class="widget-header">
-          <div class="widget-icon">𝕏</div>
-          <div>
-            <div class="widget-title">X Video Downloader</div>
-            <div class="widget-sub">Best quality MP4 · Free · No login</div>
+      <div class="launch-grid fade-up">
+        <div class="downloader-widget launch-card">
+          <div class="widget-header">
+            <div class="widget-icon">⬇</div>
+            <div>
+              <div class="widget-title">Video Downloader</div>
+              <div class="widget-sub">`yt-dlp` powered · MP4, MP3, best quality</div>
+            </div>
           </div>
+          <p>Pull media from supported sources and hand the finished file straight back to the browser.</p>
+          <ul class="launch-list">
+            <li><strong>Sources:</strong> YouTube, X/Twitter, and more</li>
+            <li><strong>Formats:</strong> best quality, MP4, MP3</li>
+            <li><strong>Runtime:</strong> dedicated container with persistent storage</li>
+          </ul>
+          <a class="dl-btn" href="https://download.inxs.live">Open downloader</a>
         </div>
 
-        <div class="url-input-wrap">
-          <input
-            class="url-input"
-            id="xUrl"
-            type="url"
-            placeholder="https://x.com/username/status/..."
-            autocomplete="off"
-            spellcheck="false"
-          />
-        </div>
-
-        <button class="dl-btn" id="dlBtn" onclick="handleDownload()">
-          <div class="spinner" id="spinner"></div>
-          <span id="dlBtnText">⬇ Download Video</span>
-        </button>
-
-        <div class="dl-result" id="dlResult">
-          <span id="dlMsg"></span>
-          <a id="dlLink" href="#" download>Download ↓</a>
+        <div class="downloader-widget launch-card">
+          <div class="widget-header">
+            <div class="widget-icon">🎞</div>
+            <div>
+              <div class="widget-title">Video Converter</div>
+              <div class="widget-sub">FFmpeg powered · Batch jobs · Quality presets</div>
+            </div>
+          </div>
+          <p>Convert uploaded files across common video formats with platform presets for YouTube, Instagram, and WhatsApp.</p>
+          <ul class="launch-list">
+            <li><strong>Formats:</strong> MP4, MOV, MKV, WEBM, AVI, and more</li>
+            <li><strong>Features:</strong> progress tracking and cancellation</li>
+            <li><strong>Runtime:</strong> separate transcoding container</li>
+          </ul>
+          <a class="dl-btn" href="https://convert.inxs.live">Open converter</a>
         </div>
 
         <p class="privacy-note">
-          🔒 Videos download directly from X's CDN.<br/>
-          Nothing is stored on our servers.
+          Umbrel-friendly deployment. Reverse-proxied with Caddy. Restart-safe with Docker volumes. Ready for Portainer.
         </p>
       </div>
 
@@ -897,22 +842,22 @@
       <div class="feature-item fade-up">
         <div class="feature-icon">⚡</div>
         <div class="feature-title">Fast by default</div>
-        <div class="feature-desc">No bloated frameworks. Every tool is built to load instantly and run without delay.</div>
+        <div class="feature-desc">Static landing page up front, focused backend services behind it. No monolith, no drag.</div>
       </div>
       <div class="feature-item fade-up">
         <div class="feature-icon">🔒</div>
-        <div class="feature-title">Privacy first</div>
-        <div class="feature-desc">Files are never stored. Processed in memory and deleted immediately after download.</div>
+        <div class="feature-title">Isolated workloads</div>
+        <div class="feature-desc">Each tool runs in its own container, so one heavy job does not take the whole site down.</div>
       </div>
       <div class="feature-item fade-up">
-        <div class="feature-icon">🆓</div>
-        <div class="feature-title">Free forever</div>
-        <div class="feature-desc">No subscriptions, no accounts, no paywalls. Every tool on INXS is free to use.</div>
+        <div class="feature-icon">🟢</div>
+        <div class="feature-title">Always on</div>
+        <div class="feature-desc">Portainer-managed containers and restart policies keep the tools online around the clock.</div>
       </div>
       <div class="feature-item fade-up">
         <div class="feature-icon">📱</div>
         <div class="feature-title">Works everywhere</div>
-        <div class="feature-desc">Fully responsive. Use any tool from your phone, tablet, or desktop — no app needed.</div>
+        <div class="feature-desc">Responsive frontends for desktop and mobile, with the compute pushed to the backend where it belongs.</div>
       </div>
     </div>
   </div>
@@ -923,117 +868,25 @@
     <p style="margin-top:8px;">Tools built to get things done.</p>
     <div class="footer-links">
       <a href="#tools">Tools</a>
-      <a href="#downloader">X Downloader</a>
+      <a href="#downloader">Media Stack</a>
       <a href="https://pdf.inxs.live">PDF Converter</a>
+      <a href="https://convert.inxs.live">Video Converter</a>
+      <a href="https://download.inxs.live">Video Downloader</a>
       <a href="mailto:hello@inxs.live">Contact</a>
     </div>
   </footer>
 
   <script>
-    // ── X Video Downloader — 100% client-side via fxtwitter API ──
-    function parseTweetUrl(url) {
-      const m = url.match(/(?:twitter\.com|x\.com)\/([\w]+)\/status\/(\d+)/i);
-      return m ? { username: m[1], id: m[2] } : null;
-    }
-
-    async function handleDownload() {
-      const urlInput = document.getElementById('xUrl');
-      const btn      = document.getElementById('dlBtn');
-      const spinner  = document.getElementById('spinner');
-      const btnText  = document.getElementById('dlBtnText');
-      const result   = document.getElementById('dlResult');
-      const msg      = document.getElementById('dlMsg');
-      const link     = document.getElementById('dlLink');
-
-      const url = urlInput.value.trim();
-
-      if (!url) { showError(result, msg, link, 'Please paste an X post URL first.'); return; }
-
-      const parsed = parseTweetUrl(url);
-      if (!parsed) { showError(result, msg, link, 'Please enter a valid X (x.com or twitter.com) post URL.'); return; }
-
-      btn.disabled = true;
-      spinner.style.display = 'block';
-      btnText.textContent = 'Fetching video…';
-      result.className = 'dl-result';
-
-      try {
-        const apiUrl = `https://api.fxtwitter.com/${parsed.username}/status/${parsed.id}`;
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-
-        if (data.code !== 200 || !data.tweet) {
-          showError(result, msg, link, 'Post not found. Make sure it\'s public and the URL is correct.');
-          return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
         }
+      });
+    }, { threshold: 0.12 });
 
-        const tweet = data.tweet;
-        const media = tweet.media;
-        if (!media || !media.all || !media.all.length) {
-          showError(result, msg, link, 'No video found in that post.');
-          return;
-        }
-
-        let bestUrl = null;
-        let bestBitrate = 0;
-
-        for (const item of media.all) {
-          if (item.type !== 'video' && item.type !== 'animated_gif') continue;
-          if (item.url && item.url.includes('.mp4') && !bestUrl) bestUrl = item.url;
-          if (item.formats) {
-            for (const fmt of item.formats) {
-              if (fmt.container === 'mp4' && (fmt.bitrate || 0) > bestBitrate) {
-                bestBitrate = fmt.bitrate || 0;
-                bestUrl = fmt.url;
-              }
-            }
-          }
-        }
-
-        if (!bestUrl) { showError(result, msg, link, 'Could not extract a download URL.'); return; }
-
-        const filename = `${parsed.username}_${parsed.id}.mp4`;
-
-        // Try fetch+blob first (works if CORS allows)
-        try {
-          const vr = await fetch(bestUrl);
-          const blob = await vr.blob();
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = blobUrl; a.download = filename;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
-          result.className = 'dl-result success';
-          msg.textContent = '✅ Download started!';
-          link.style.display = 'none';
-        } catch {
-          // CORS blocked — show direct link (right-click → Save As)
-          result.className = 'dl-result success';
-          msg.textContent = '✅ Video ready — click to download';
-          link.href = bestUrl;
-          link.setAttribute('download', filename);
-          link.style.display = 'inline-block';
-        }
-
-      } catch (err) {
-        showError(result, msg, link, 'Network error — check your connection and try again.');
-      } finally {
-        btn.disabled = false;
-        spinner.style.display = 'none';
-        btnText.textContent = '⬇ Download Video';
-      }
-    }
-
-    function showError(result, msg, link, text) {
-      result.className = 'dl-result error';
-      msg.textContent = '❌ ' + text;
-      link.style.display = 'none';
-    }
-
-    document.getElementById('xUrl').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleDownload();
-    });
-
+    document.querySelectorAll('.fade-up').forEach((item) => observer.observe(item));
   </script>
 
 </body>
