@@ -1,13 +1,4 @@
 services:
-  caddy:
-    build:
-      context: ..
-      dockerfile: deploy/caddy/Dockerfile
-    container_name: inxs-caddy
-    restart: unless-stopped
-    expose:
-      - "80"
-
   pdf-docs:
     build:
       context: ../apps/pdf-docs
@@ -63,7 +54,6 @@ services:
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
-      - caddy
       - pdf-docs
       - video-converter
       - video-downloader

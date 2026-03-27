@@ -1,21 +1,21 @@
 # INXS Umbrel Stack
 
-This stack keeps the `INXS-Live` site and the three tool backends running 24/7 behind a Cloudflare Tunnel.
+This stack keeps the three backend tools running 24/7 behind a Cloudflare Tunnel while `inxs.live` stays on Vercel.
 
 ## What it serves
 
-- `https://inxs.live` -> static landing page from the repo root
 - `https://pdf.inxs.live` -> PDF/DOCX converter
 - `https://convert.inxs.live` -> video converter
 - `https://download.inxs.live` -> video downloader
+- `https://inxs.live` remains hosted by Vercel
 
 ## Repo layout
 
-- `index.html` -> public landing page
+- `index.html` -> public landing page for Vercel
 - `apps/pdf-docs` -> PDF/DOCX service
 - `apps/video-converter` -> FFmpeg conversion service
 - `apps/video-downloader` -> yt-dlp download service
-- `deploy` -> Caddy, Cloudflare Tunnel, and Docker Compose stack
+- `deploy` -> Cloudflare Tunnel and Docker Compose stack
 
 ## Cloudflare Tunnel
 
@@ -24,8 +24,6 @@ This deployment does not require opening inbound ports on the Umbrel Pi.
 1. In Cloudflare Zero Trust, create a remotely-managed tunnel.
 2. Copy the tunnel token.
 3. In the tunnel's Public hostnames settings, add:
-   - `inxs.live` -> `http://caddy:80`
-   - `www.inxs.live` -> `http://caddy:80`
    - `pdf.inxs.live` -> `http://pdf-docs:8000`
    - `convert.inxs.live` -> `http://video-converter:3000`
    - `download.inxs.live` -> `http://video-downloader:4000`
@@ -60,3 +58,4 @@ Docker named volumes keep output files across restarts:
 - The PDF tool depends on LibreOffice for DOCX -> PDF.
 - The downloader's desktop-only "Open Downloads Folder" button is disabled in the server deployment.
 - `cloudflared` only makes outbound connections, so no router port forwarding is required.
+- Keep the existing DNS/Vercel setup for `inxs.live` and `www.inxs.live`.

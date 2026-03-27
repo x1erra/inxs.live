@@ -1,8 +1,0 @@
-:80 {
-  auto_https off
-  root * /srv/site
-  encode zstd gzip
-  @blocked path /apps* /deploy* /.git*
-  respond @blocked 404
-  file_server
-}
