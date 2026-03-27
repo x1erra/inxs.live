@@ -24,9 +24,9 @@ This deployment does not require opening inbound ports on the Umbrel Pi.
 1. In Cloudflare Zero Trust, create a remotely-managed tunnel.
 2. Copy the tunnel token.
 3. In the tunnel's Public hostnames settings, add:
-   - `pdf.inxs.live` -> `http://pdf-docs:8000`
-   - `convert.inxs.live` -> `http://video-converter:3000`
-   - `download.inxs.live` -> `http://video-downloader:4000`
+   - `pdf.inxs.live` -> `http://host.docker.internal:18000`
+   - `convert.inxs.live` -> `http://host.docker.internal:13000`
+   - `download.inxs.live` -> `http://host.docker.internal:14000`
 4. Add `CLOUDFLARE_TUNNEL_TOKEN=<your tunnel token>` to the stack environment in Portainer.
 
 Cloudflare will handle the DNS and edge routing for those hostnames automatically through the tunnel.
@@ -59,3 +59,4 @@ Docker named volumes keep output files across restarts:
 - The downloader's desktop-only "Open Downloads Folder" button is disabled in the server deployment.
 - `cloudflared` only makes outbound connections, so no router port forwarding is required.
 - Keep the existing DNS/Vercel setup for `inxs.live` and `www.inxs.live`.
+- The backend ports are bound to `127.0.0.1` only, so they stay private to the Umbrel host.
