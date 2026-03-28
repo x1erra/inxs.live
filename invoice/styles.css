@@ -998,6 +998,8 @@ input[type="file"] {
     border-radius: 0;
     padding: 0 0.35in 0.35in;
     break-inside: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .sheet-accent {
@@ -1063,6 +1065,7 @@ input[type="file"] {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(1.8in, 0.8fr);
     gap: 0.14in;
+    margin-top: auto;
   }
 
   .note-stack {
