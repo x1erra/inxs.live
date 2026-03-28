@@ -295,8 +295,8 @@ input[type="file"] {
 .line-items-head,
 .line-item-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) repeat(3, minmax(4.5rem, 0.9fr)) minmax(6.6rem, 1.08fr) auto;
-  gap: 10px;
+  grid-template-columns: minmax(11rem, 3.4fr) minmax(3.4rem, 0.7fr) minmax(4.1rem, 0.9fr) minmax(3.75rem, 0.78fr) minmax(5.9rem, 1fr) 2.5rem;
+  gap: 8px;
   align-items: center;
 }
 
@@ -316,7 +316,7 @@ input[type="file"] {
 }
 
 .line-item-row {
-  padding: 12px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(204, 189, 171, 0.92);
   border-radius: 18px;
@@ -339,16 +339,22 @@ input[type="file"] {
 
 .line-item-row input[type="number"] {
   appearance: textfield;
-  padding-inline: 10px;
+  padding-inline: 8px;
   text-align: center;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
 
-.line-item-row input[data-line-field="qty"],
-.line-item-row input[data-line-field="rate"],
+.line-item-row input[data-line-field="qty"] {
+  min-width: 3.4rem;
+}
+
+.line-item-row input[data-line-field="rate"] {
+  min-width: 4.1rem;
+}
+
 .line-item-row input[data-line-field="tax"] {
-  min-width: 4.5rem;
+  min-width: 3.75rem;
 }
 
 .line-item-row input[data-line-field="tax"] {
@@ -370,7 +376,7 @@ input[type="file"] {
 
 .line-item-amount {
   min-height: 48px;
-  min-width: 6.6rem;
+  min-width: 5.9rem;
   display: flex;
   align-items: center;
   justify-content: flex-end;
