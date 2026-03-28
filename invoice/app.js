@@ -7,6 +7,8 @@ const THEMES = {
   rose: { name: "Rose", accent: "#ca5569", soft: "#fde3e7", deep: "#8f3443" },
 };
 
+const LINE_ITEM_DESCRIPTION_MAX_LENGTH = 120;
+
 const CURRENCY_META = {
   CAD: { label: "CAD", locale: "en-CA", currency: "CAD", maxFractionDigits: 2 },
   USD: { label: "USD", locale: "en-US", currency: "USD", maxFractionDigits: 2 },
@@ -123,7 +125,8 @@ function handleLineItemChange(event) {
   }
 
   if (field === "description") {
-    item.description = event.target.value;
+    item.description = clampText(event.target.value, LINE_ITEM_DESCRIPTION_MAX_LENGTH);
+    event.target.value = item.description;
   } else if (field === "qty") {
     item.qty = clampNumber(event.target.value, 0);
   } else if (field === "rate") {
@@ -210,9 +213,10 @@ function renderLineItemControls() {
           <input
             class="line-item-description"
             type="text"
+            maxlength="${LINE_ITEM_DESCRIPTION_MAX_LENGTH}"
             data-line-id="${item.id}"
             data-line-field="description"
-            value="${escapeAttribute(item.description)}"
+            value="${escapeAttribute(clampText(item.description, LINE_ITEM_DESCRIPTION_MAX_LENGTH))}"
             placeholder="Website design sprint"
           />
           <input
@@ -291,10 +295,10 @@ function renderPreview() {
 
   previewRefs.lineItems.innerHTML = state.lineItems
     .map((item) => {
-      const description = item.description || "Line item";
+      const description = clampText(item.description, LINE_ITEM_DESCRIPTION_MAX_LENGTH) || "Line item";
       return `
         <tr>
-          <td>${escapeHtml(description)}</td>
+          <td class="preview-line-description">${escapeHtml(description)}</td>
           <td>${formatQuantity(item.qty)}</td>
           <td>${formatMoney(item.rate, state.currency)}</td>
           <td>${formatPercent(item.tax)}</td>
@@ -473,7 +477,7 @@ function downloadPdf() {
 
   const tableStartY = Math.max(250, cursorY + 44 + clientLines.length * 13 + 18);
   const rows = state.lineItems.map((item) => [
-    item.description || "Line item",
+    clampText(item.description, LINE_ITEM_DESCRIPTION_MAX_LENGTH) || "Line item",
     formatQuantity(item.qty),
     formatMoney(item.rate, state.currency),
     formatPercent(item.tax),
@@ -687,6 +691,10 @@ function clampNumber(value, min = 0, max = Number.POSITIVE_INFINITY) {
   }
 
   return Math.min(Math.max(numericValue, min), max);
+}
+
+function clampText(value, maxLength) {
+  return String(value || "").slice(0, maxLength);
 }
 
 function toIsoDate(date) {
