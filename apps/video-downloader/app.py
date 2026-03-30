@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DOWNLOAD_DIR = Path(os.environ.get("DOWNLOAD_DIR", str(Path.home() / "Downloads"))).expanduser()
 DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 OPEN_DOWNLOADS_ENABLED = os.environ.get("ENABLE_OPEN_DOWNLOADS", "").lower() in {"1", "true", "yes"}
+COOKIES_FILE = os.environ.get("COOKIES_FILE", "").strip() or None
 
 app = Flask(__name__)
 
@@ -90,6 +91,9 @@ def _download_worker(job_id: str, url: str, format_choice: str):
         "no_warnings": True,
         "restrictfilenames": False,
     }
+
+    if COOKIES_FILE and Path(COOKIES_FILE).is_file():
+        ydl_opts["cookiefile"] = COOKIES_FILE
 
     if format_choice == "mp3":
         if shutil.which("ffmpeg") is None:
