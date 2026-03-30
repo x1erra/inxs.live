@@ -866,7 +866,7 @@ function generatePreview() {
   var leaseHtml = generateLease(formData, selectedSchedules);
   var timelineHtml = currentProvince ? generateTimeline(formData, currentProvince) : '';
   var sigHtml = createSignatureSection();
-  $('#lease-preview').innerHTML = timelineHtml + leaseHtml + sigHtml;
+  $('#lease-preview').innerHTML = leaseHtml + sigHtml + timelineHtml;
   setTimeout(function() {
     var lc = $('#sig-landlord'); var tc = $('#sig-tenant');
     if (lc) sigPadLandlord = new SignaturePad(lc);
