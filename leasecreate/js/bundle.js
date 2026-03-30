@@ -831,7 +831,7 @@ function setupDraftsUI() {
   c.addEventListener('click', function(e) {
     if (e.target.id === 'btn-save-draft') { var ni = $('#draftName'); var name = ni.value.trim() || ('Draft ' + new Date().toLocaleDateString()); saveDraft(name, collectFormData()); ni.value = ''; c.innerHTML = renderDraftManager(); showToast('Draft saved!'); }
     if (e.target.classList.contains('draft-load')) { var d = loadDraft(e.target.dataset.draft); if (d) { restoreDraftProgress(d); showToast('Loaded: ' + e.target.dataset.draft); } }
-    if (e.target.classList.contains('draft-delete')) { deleteDraft(e.target.dataset.draft); c.innerHTML = renderDraftManager(); showToast('Draft deleted'); }
+    if (e.target.classList.contains('draft-delete')) { e.stopPropagation(); deleteDraft(e.target.dataset.draft); var dl = document.getElementById('drafts-list'); var remaining = getDraftList(); dl.innerHTML = remaining.length === 0 ? '<p class="drafts-empty">No saved drafts yet.</p>' : remaining.map(function(d) { return '<div class="draft-item"><div class="draft-info"><strong>' + escH(d.name) + '</strong><span>' + new Date(d.savedAt).toLocaleString() + '</span></div><div class="draft-actions"><button class="btn btn-sm btn-primary draft-load" data-draft="' + escH(d.name) + '">Load</button><button class="btn btn-sm btn-danger draft-delete" data-draft="' + escH(d.name) + '">Delete</button></div></div>'; }).join(''); showToast('Draft deleted'); }
   });
 }
 
