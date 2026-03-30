@@ -1322,6 +1322,16 @@ a:hover { color: var(--primary-dark); }
   .timeline-label { font-size: 9pt; }
   .timeline-desc  { font-size: 8pt; }
 
+  /* Every individual point/item stays whole on its page */
+  .lease-section p,
+  .lease-section li,
+  .lease-section tr,
+  .lease-section .lease-field,
+  .lease-section .sig-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   /* Tables and signature blocks stay intact */
   table, .sig-grid {
     break-inside: avoid;
