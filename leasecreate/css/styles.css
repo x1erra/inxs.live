@@ -1269,43 +1269,60 @@ a:hover { color: var(--primary-dark); }
 
   #lease-preview { padding: 0; margin: 0; }
 
-  /* Every section starts on a fresh page — guarantees no mid-section cuts */
+  /* Sections flow naturally — no mid-section cuts where possible */
   .lease-section {
-    break-before: page;
-    page-break-before: always;
     break-inside: avoid;
     page-break-inside: avoid;
-    padding: 0;
+    padding: 12pt 0;
     margin: 0;
-    border: none;
+    border-bottom: 1px solid #ccc;
   }
 
-  /* Header sits at the very top — no page break before it */
+  /* Header stays together at top */
   .lease-header {
-    break-before: auto;
-    page-break-before: auto;
     break-inside: avoid;
     page-break-inside: avoid;
-    padding-bottom: 16pt;
+    padding-bottom: 14pt;
     border-bottom: 2px solid #000;
   }
 
-  /* Schedules and signatures already get a fresh page via .lease-section rule */
+  /* Section 3 (Term) and Section 8 (Maintenance) always start fresh */
+  .lease-section-term,
+  .lease-section-maintenance {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* Schedules and signatures on their own page */
   .lease-schedule,
   .lease-signatures {
     break-before: page;
     page-break-before: always;
-  }
-
-  /* Timeline on its own page */
-  .timeline, .lease-timeline {
-    break-before: page;
-    page-break-before: always;
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  /* Tables and sig blocks stay intact within their page */
+  /* Timeline: compressed to fit on one page, never splits */
+  .timeline {
+    break-before: page;
+    page-break-before: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    font-size: 8.5pt;
+  }
+
+  .timeline-event {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 4pt 0;
+  }
+
+  .timeline-title { font-size: 11pt; margin-bottom: 6pt; }
+  .timeline-date  { font-size: 8pt; }
+  .timeline-label { font-size: 9pt; }
+  .timeline-desc  { font-size: 8pt; }
+
+  /* Tables and signature blocks stay intact */
   table, .sig-grid {
     break-inside: avoid;
     page-break-inside: avoid;
