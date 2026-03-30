@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeaseCreate — Canadian Residential Lease Agreement Generator</title>
+  <meta name="description" content="Generate legally compliant residential lease agreements for any Canadian province. Free, private, 100% browser-based. Includes schedules, deposit rules, and provincial legislation references." />
+  <meta name="keywords" content="lease agreement generator, Canadian lease, Ontario standard lease, BC rental agreement, Alberta lease, residential tenancy agreement, lease creator, rental agreement template" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="LeaseCreate — Canadian Lease Agreement Generator" />
+  <meta property="og:description" content="Generate legally compliant residential lease agreements for any Canadian province. Free, private, 100% browser-based." />
+  <meta property="og:type" content="website" />
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "LeaseCreate",
+    "description": "Free browser-based Canadian residential lease agreement generator with provincial compliance, schedules, and legal references.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
+    "areaServed": { "@type": "Country", "name": "Canada" }
+  }
+  </script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="logo" aria-label="LeaseCreate home">
+      <div class="logo-icon">LC</div>
+      <div>
+        <div class="logo-text" data-i18n="app.name">LeaseCreate</div>
+        <div class="logo-tagline" data-i18n="app.tagline">Provincial lease agreements made simple</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn btn-sm btn-secondary" id="lang-switch" title="Toggle French/English">FR</button>
+      <div class="header-badge">
+        <span>&#128274;</span> <span data-i18n="app.privacy">Private — nothing leaves your browser</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <h1><span data-i18n="hero.title.pre">Create a </span><span data-i18n="hero.title.highlight">Legally Compliant</span><span data-i18n="hero.title.post"> Lease</span></h1>
+    <p data-i18n="hero.subtitle">
+      Generate a residential tenancy agreement tailored to your province's legislation.
+      Add schedules, review prohibited clauses, and export to PDF — all in your browser.
+    </p>
+    <div class="hero-features">
+      <div class="hero-feature"><strong>10</strong> <span data-i18n="hero.provinces">Provinces</span></div>
+      <div class="hero-feature"><strong>10+</strong> <span data-i18n="hero.schedules">Schedules</span></div>
+      <div class="hero-feature"><strong>100%</strong> <span data-i18n="hero.free">Free &amp; Private</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Step Indicator ──────────────────────────────────────────────────────── -->
+<div class="step-indicator">
+  <div class="step active">
+    <span class="step-num">1</span>
+    <span class="step-label" data-i18n="step.1">Province &amp; Parties</span>
+  </div>
+  <div class="step">
+    <span class="step-num">2</span>
+    <span class="step-label" data-i18n="step.2">Rental Unit</span>
+  </div>
+  <div class="step">
+    <span class="step-num">3</span>
+    <span class="step-label" data-i18n="step.3">Term &amp; Rent</span>
+  </div>
+  <div class="step">
+    <span class="step-num">4</span>
+    <span class="step-label" data-i18n="step.4">Rules &amp; Details</span>
+  </div>
+  <div class="step">
+    <span class="step-num">5</span>
+    <span class="step-label" data-i18n="step.5">Schedules</span>
+  </div>
+  <div class="step">
+    <span class="step-num">6</span>
+    <span class="step-label" data-i18n="step.6">Preview &amp; Export</span>
+  </div>
+</div>
+
+<!-- ── Rights Sidebar (Feature 5) ──────────────────────────────────────────── -->
+<button class="rights-toggle" id="rights-toggle" data-i18n="rights.toggle">Know Your Rights</button>
+<aside class="rights-sidebar" id="rights-sidebar"></aside>
+
+<main>
+<div class="container">
+
+<!-- ── Templates & Drafts Bar (Features 9 & 10) ────────────────────────────── -->
+<div class="toolbar-bar">
+  <details class="toolbar-section">
+    <summary data-i18n="templates.title">Start from a Template</summary>
+    <div id="template-container"></div>
+  </details>
+  <details class="toolbar-section">
+    <summary data-i18n="drafts.load">Saved Drafts</summary>
+    <div id="drafts-container"></div>
+  </details>
+  <details class="toolbar-section">
+    <summary>Import Existing Lease</summary>
+    <div id="import-container"></div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- STEP 1: Province & Parties                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-step active" data-step="1">
+  <div class="step-card">
+    <h2 data-i18n="step1.title">Province &amp; Parties</h2>
+    <p class="step-desc" data-i18n="step1.desc">Select your province and enter landlord/tenant information.</p>
+
+    <div class="form-group">
+      <label for="province"><span data-i18n="step1.province">Province</span> <span class="required">*</span></label>
+      <select id="province" required>
+        <option value="">Select a province...</option>
+      </select>
+    </div>
+
+    <div id="province-info" hidden></div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--gray-200);">
+
+    <h3 style="margin-bottom: 16px;" data-i18n="step1.landlord">Landlord Information</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="landlordName"><span data-i18n="step1.landlord.name">Full Legal Name</span> <span class="required">*</span></label>
+        <input type="text" id="landlordName" required placeholder="John Smith or ABC Property Management Inc.">
+      </div>
+      <div class="form-group">
+        <label for="landlordEmail" data-i18n="step1.landlord.email">Email</label>
+        <input type="email" id="landlordEmail" placeholder="landlord@email.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="landlordAddress" data-i18n="step1.landlord.address">Mailing Address</label>
+        <input type="text" id="landlordAddress" placeholder="123 Main St, City, Province, Postal Code">
+      </div>
+      <div class="form-group">
+        <label for="landlordPhone" data-i18n="step1.landlord.phone">Phone</label>
+        <input type="tel" id="landlordPhone" placeholder="(555) 123-4567">
+      </div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--gray-200);">
+
+    <h3 style="margin-bottom: 16px;" data-i18n="step1.tenant">Tenant Information</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="tenantName"><span data-i18n="step1.tenant.name">Full Legal Name</span> <span class="required">*</span></label>
+        <input type="text" id="tenantName" required placeholder="Jane Doe">
+      </div>
+      <div class="form-group">
+        <label for="tenantEmail" data-i18n="step1.tenant.email">Email</label>
+        <input type="email" id="tenantEmail" placeholder="tenant@email.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="tenantPhone" data-i18n="step1.tenant.phone">Phone</label>
+        <input type="tel" id="tenantPhone" placeholder="(555) 987-6543">
+      </div>
+      <div class="form-group">
+        <label for="additionalTenants" data-i18n="step1.tenant.additional">Additional Tenant(s)</label>
+        <input type="text" id="additionalTenants" placeholder="Names of other tenants (comma separated)">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div></div>
+      <button class="btn btn-primary btn-next">Next: Rental Unit &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- STEP 2: Rental Unit                                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-step" data-step="2">
+  <div class="step-card">
+    <h2 data-i18n="step2.title">Rental Unit Details</h2>
+    <p class="step-desc" data-i18n="step2.desc">Describe the property being rented.</p>
+
+    <div class="form-row">
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label for="unitAddress"><span data-i18n="step2.address">Street Address</span> <span class="required">*</span></label>
+        <input type="text" id="unitAddress" required placeholder="456 Rental Ave">
+      </div>
+    </div>
+    <div class="form-row three">
+      <div class="form-group">
+        <label for="unitNumber" data-i18n="step2.unit">Unit / Suite #</label>
+        <input type="text" id="unitNumber" placeholder="Apt 2B">
+      </div>
+      <div class="form-group">
+        <label for="city"><span data-i18n="step2.city">City</span> <span class="required">*</span></label>
+        <input type="text" id="city" required placeholder="Toronto">
+      </div>
+      <div class="form-group">
+        <label for="postalCode"><span data-i18n="step2.postal">Postal Code</span> <span class="required">*</span></label>
+        <input type="text" id="postalCode" required placeholder="M5V 1A1">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="unitType" data-i18n="step2.type">Unit Type</label>
+        <select id="unitType">
+          <option value="">Select...</option>
+          <option value="Apartment">Apartment</option>
+          <option value="Condo">Condo/Condominium</option>
+          <option value="House">House</option>
+          <option value="Townhouse">Townhouse</option>
+          <option value="Basement">Basement Apartment</option>
+          <option value="Duplex">Duplex</option>
+          <option value="Room">Room in Shared Dwelling</option>
+          <option value="Studio">Studio/Bachelor</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group" style="display: flex; flex-direction: column; justify-content: flex-end;">
+        <div class="form-check">
+          <input type="checkbox" id="isFurnished">
+          <label for="isFurnished" data-i18n="step2.furnished">Furnished</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-check">
+          <input type="checkbox" id="parkingIncluded">
+          <label for="parkingIncluded" data-i18n="step2.parking">Parking included</label>
+        </div>
+        <input type="text" id="parkingDetails" placeholder="Parking details (e.g., 1 underground spot)" style="margin-top: 6px;">
+      </div>
+      <div class="form-group">
+        <div class="form-check">
+          <input type="checkbox" id="storageIncluded">
+          <label for="storageIncluded" data-i18n="step2.storage">Storage locker included</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-prev">&larr; Back</button>
+      <button class="btn btn-primary btn-next">Next: Term &amp; Rent &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- STEP 3: Term & Rent                                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-step" data-step="3">
+  <div class="step-card">
+    <h2 data-i18n="step3.title">Tenancy Term &amp; Rent</h2>
+    <p class="step-desc" data-i18n="step3.desc">Set the lease term, rent amount, and deposit details.</p>
+
+    <h3 style="margin-bottom: 12px;">Tenancy Type</h3>
+    <div class="form-row">
+      <div class="form-check">
+        <input type="radio" name="termType" id="termFixed" value="fixed" checked>
+        <label for="termFixed" data-i18n="step3.fixed">Fixed Term (e.g., 1 year)</label>
+      </div>
+      <div class="form-check">
+        <input type="radio" name="termType" id="termMonthly" value="monthly">
+        <label for="termMonthly" data-i18n="step3.monthly">Month-to-Month (Periodic)</label>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top: 16px;">
+      <div class="form-group">
+        <label for="startDate"><span data-i18n="step3.start">Start Date</span> <span class="required">*</span></label>
+        <input type="date" id="startDate" required>
+      </div>
+      <div class="form-group" id="endDateGroup">
+        <label for="endDate"><span data-i18n="step3.end">End Date</span> <span class="required">*</span></label>
+        <input type="date" id="endDate">
+      </div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--gray-200);">
+
+    <h3 style="margin-bottom: 12px;">Rent</h3>
+    <div class="form-row three">
+      <div class="form-group">
+        <label for="rentAmount"><span data-i18n="step3.rent">Monthly Rent ($)</span> <span class="required">*</span></label>
+        <input type="number" id="rentAmount" required step="0.01" placeholder="1800.00">
+      </div>
+      <div class="form-group">
+        <label for="rentDueDay" data-i18n="step3.due">Due Day</label>
+        <select id="rentDueDay">
+          <option value="1st">1st of the month</option>
+          <option value="15th">15th of the month</option>
+          <option value="Last day">Last day of the month</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="paymentMethod" data-i18n="step3.method">Payment Method</label>
+        <select id="paymentMethod">
+          <option value="E-transfer">E-transfer</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Direct deposit">Direct deposit</option>
+          <option value="Cash">Cash</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--gray-200);">
+
+    <h3 style="margin-bottom: 12px;" data-i18n="step3.deposits">Deposits</h3>
+    <div id="deposit-fields">
+      <p class="form-notice">Select a province in Step 1 to see deposit rules for your jurisdiction.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-prev">&larr; Back</button>
+      <button class="btn btn-primary btn-next">Next: Rules &amp; Details &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- STEP 4: Rules & Details                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-step" data-step="4">
+  <div class="step-card">
+    <h2 data-i18n="step4.title">Rules, Utilities &amp; Details</h2>
+    <p class="step-desc" data-i18n="step4.desc">Set house rules, utility responsibilities, and additional terms.</p>
+
+    <h3 style="margin-bottom: 12px;">House Rules</h3>
+    <div class="form-row">
+      <div>
+        <div class="form-check">
+          <input type="checkbox" id="smokingAllowed">
+          <label for="smokingAllowed" data-i18n="step4.smoking">Smoking permitted</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="petsAllowed">
+          <label for="petsAllowed" data-i18n="step4.pets">Pets permitted</label>
+        </div>
+        <p id="pet-notice" hidden></p>
+      </div>
+      <div>
+        <div class="form-check">
+          <input type="checkbox" id="tenantInsurance">
+          <label for="tenantInsurance" data-i18n="step4.insurance">Tenant insurance required</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top: 12px;">
+      <div class="form-group">
+        <label for="guestPolicy" data-i18n="step4.guest">Guest Policy</label>
+        <input type="text" id="guestPolicy" placeholder="e.g., Guests may stay up to 14 consecutive days">
+      </div>
+      <div class="form-group">
+        <label for="noisePolicy" data-i18n="step4.noise">Quiet Hours</label>
+        <input type="text" id="noisePolicy" placeholder="e.g., 10 PM to 8 AM">
+      </div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--gray-200);">
+
+    <h3 style="margin-bottom: 12px;" data-i18n="step4.utilities">Utilities Included in Rent</h3>
+    <div class="utility-grid">
+      <div class="utility-item">
+        <span>Heat</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="heat" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="utility-item">
+        <span>Electricity</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="electricity">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="utility-item">
+        <span>Water</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="water" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="utility-item">
+        <span>Internet</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="internet">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="utility-item">
+        <span>Cable / TV</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="cabletv">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="utility-item">
+        <span>Laundry</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="laundry">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="utility-item">
+        <span>Air Conditioning</span>
+        <label class="toggle-switch">
+          <input type="checkbox" class="utility-toggle" data-utility="airconditioning">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--gray-200);">
+
+    <div class="form-group">
+      <label for="maintenanceNotes" data-i18n="step4.maintenance">Maintenance Notes</label>
+      <textarea id="maintenanceNotes" rows="3" placeholder="Any specific maintenance responsibilities or notes..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="additionalTerms" data-i18n="step4.additional">Additional Terms</label>
+      <textarea id="additionalTerms" rows="4" placeholder="Any additional terms or conditions agreed between parties..."></textarea>
+      <span class="field-help">Terms that conflict with provincial legislation are void and unenforceable.</span>
+      <!-- Feature 1: Clause Checker results -->
+      <div id="clause-check-results" class="clause-results" hidden></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-prev">&larr; Back</button>
+      <button class="btn btn-primary btn-next">Next: Schedules &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- STEP 5: Schedules                                                        -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-step" data-step="5">
+  <div class="step-card">
+    <h2 data-i18n="step5.title">Schedules (Additional Agreements)</h2>
+    <p class="step-desc" data-i18n="step5.desc">Select any additional schedules to attach to the lease. These become part of the agreement.</p>
+
+    <div id="schedule-list">
+      <p class="form-notice">Select a province first to see available schedules.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-prev">&larr; Back</button>
+      <button class="btn btn-primary btn-next" data-i18n="btn.generate">Generate Lease &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- STEP 6: Preview & Export                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-step" data-step="6">
+  <div class="step-card">
+    <h2 data-i18n="step6.title">Preview &amp; Export</h2>
+    <p class="step-desc" data-i18n="step6.desc">Review your lease agreement and export to PDF.</p>
+
+    <div class="preview-actions">
+      <button class="btn btn-success btn-lg" id="btn-export" data-i18n="step6.export">Export as PDF</button>
+      <button class="btn btn-secondary" id="btn-edit" data-i18n="step6.edit">&larr; Edit Details</button>
+      <button class="btn btn-secondary" id="btn-regenerate" data-i18n="step6.regenerate">Regenerate Preview</button>
+    </div>
+  </div>
+
+  <div id="lease-preview"></div>
+
+  <div style="text-align: center; margin: 24px 0;">
+    <button class="btn btn-success btn-lg" onclick="document.getElementById('btn-export').click()" data-i18n="step6.export">Export as PDF</button>
+  </div>
+</div>
+
+</div><!-- .container -->
+</main>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <p data-i18n="footer.disclaimer">
+    <strong>LeaseCreate</strong> generates lease templates for informational purposes only.
+    This is not legal advice. Consult a lawyer or your provincial tenancy board for legal guidance.
+  </p>
+  <p style="margin-top: 8px;" data-i18n="footer.privacy">
+    100% client-side — your data never leaves your browser.
+  </p>
+</footer>
+
+<script src="js/bundle.js"></script>
+</body>
+</html>
