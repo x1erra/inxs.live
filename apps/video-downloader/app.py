@@ -90,7 +90,7 @@ def _download_worker(job_id: str, url: str, format_choice: str):
         "quiet": True,
         "no_warnings": True,
         "restrictfilenames": False,
-        "extractor_args": {"youtube": {"player_client": ["web"]}},
+        "extractor_args": {"youtube": {"player_client": ["tv_embedded", "android", "web"]}},
     }
 
     if COOKIES_FILE and Path(COOKIES_FILE).is_file():
