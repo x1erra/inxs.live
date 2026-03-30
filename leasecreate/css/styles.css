@@ -1286,18 +1286,15 @@ a:hover { color: var(--primary-dark); }
     border-bottom: 2px solid #000;
   }
 
-  /* Section 3 (Term) and Section 8 (Maintenance) always start fresh */
-  .lease-section-term,
-  .lease-section-maintenance {
+  /* Schedules on their own page */
+  .lease-schedule {
     break-before: page;
     page-break-before: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
-  /* Schedules and signatures on their own page */
-  .lease-schedule,
   .lease-signatures {
-    break-before: page;
-    page-break-before: always;
     break-inside: avoid;
     page-break-inside: avoid;
   }
