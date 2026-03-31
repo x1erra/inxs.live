@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DOWNLOAD_DIR = Path(os.environ.get("DOWNLOAD_DIR", str(Path.home() / "Downloads"))).expanduser()
 DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 JOB_STATE_DIR = Path(
-    os.environ.get("JOB_STATE_DIR", str(DOWNLOAD_DIR.parent / ".video-downloader-jobs"))
+    os.environ.get("JOB_STATE_DIR", str(DOWNLOAD_DIR / ".video-downloader-jobs"))
 ).expanduser()
 JOB_STATE_DIR.mkdir(parents=True, exist_ok=True)
 OPEN_DOWNLOADS_ENABLED = os.environ.get("ENABLE_OPEN_DOWNLOADS", "").lower() in {"1", "true", "yes"}
@@ -129,6 +129,29 @@ def _get_job(job_id: str):
         jobs[job_id] = job
 
     return dict(job)
+
+
+def _list_jobs():
+    combined = {}
+
+    with jobs_lock:
+        for job_id, job in jobs.items():
+            combined[job_id] = dict(job)
+
+    for path in JOB_STATE_DIR.glob("*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        job_id = payload.get("job_id") or path.stem
+        existing = combined.get(job_id, {})
+        merged = dict(payload)
+        merged.update(existing)
+        merged.setdefault("job_id", job_id)
+        combined[job_id] = merged
+
+    return list(combined.values())
 
 
 def _resolve_output_file(filename: str, format_choice: str, info: dict):
@@ -438,8 +461,7 @@ def debug_env():
 
 @app.get("/api/last-error")
 def last_error():
-    with jobs_lock:
-        failed = [j for j in jobs.values() if j.get("status") == "error"]
+    failed = [job for job in _list_jobs() if job.get("status") == "error"]
     if not failed:
         return jsonify({"message": "No failed jobs found"}), 404
     latest = max(failed, key=lambda j: j.get("created_at", 0))
