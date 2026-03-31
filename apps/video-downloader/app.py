@@ -58,6 +58,23 @@ def _set_job(job_id: str, **updates):
             jobs.pop(jid, None)
 
 
+class _CapturingLogger:
+    def __init__(self):
+        self.lines = []
+
+    def debug(self, msg):
+        self.lines.append(msg)
+
+    def info(self, msg):
+        self.lines.append(msg)
+
+    def warning(self, msg):
+        self.lines.append(f"WARNING: {msg}")
+
+    def error(self, msg):
+        self.lines.append(f"ERROR: {msg}")
+
+
 def _download_worker(job_id: str, url: str, format_choice: str):
     if yt_dlp is None:
         _set_job(job_id, status="error", error="Missing dependency: yt-dlp is not installed.")
@@ -65,6 +82,8 @@ def _download_worker(job_id: str, url: str, format_choice: str):
 
     # Keep names very short for fragment/temp suffixes used by some extractors.
     output_template = str(DOWNLOAD_DIR / "%(id)s_%(title).30s.%(ext)s")
+
+    logger = _CapturingLogger()
 
     def progress_hook(data):
         status = data.get("status")
@@ -88,7 +107,9 @@ def _download_worker(job_id: str, url: str, format_choice: str):
         "progress_hooks": [progress_hook],
         "noplaylist": True,
         "quiet": True,
-        "no_warnings": True,
+        "no_warnings": False,
+        "verbose": True,
+        "logger": logger,
         "restrictfilenames": False,
     }
 
@@ -163,7 +184,8 @@ def _download_worker(job_id: str, url: str, format_choice: str):
                 completed_at=int(time.time()),
             )
     except Exception as exc:
-        _set_job(job_id, status="error", error=str(exc), message="Download failed")
+        _set_job(job_id, status="error", error=str(exc), message="Download failed",
+                 debug_log="\n".join(logger.lines[-80:]))
 
 
 @app.get("/")
@@ -179,6 +201,41 @@ def index():
 @app.get("/healthz")
 def healthcheck():
     return jsonify({"status": "ok"})
+
+
+@app.get("/api/debug")
+def debug_env():
+    def run(cmd):
+        try:
+            return subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=5).decode().strip()
+        except Exception as e:
+            return f"ERROR: {e}"
+
+    # Check yt-dlp plugins
+    try:
+        import yt_dlp.plugins as _plugins
+        plugins = [str(p) for p in getattr(_plugins, "_plugins", {}).keys()]
+    except Exception as e:
+        plugins = [f"ERROR: {e}"]
+
+    # Check curl_cffi
+    try:
+        import curl_cffi
+        curl_cffi_version = curl_cffi.__version__
+    except ImportError:
+        curl_cffi_version = "NOT INSTALLED"
+
+    return jsonify({
+        "yt_dlp_version": yt_dlp.version.__version__ if yt_dlp else "NOT INSTALLED",
+        "deno": run(["deno", "--version"]).splitlines()[0] if shutil.which("deno") else "NOT FOUND",
+        "bgutil_pot": run(["bgutil-pot", "--version"]) if shutil.which("bgutil-pot") else "NOT FOUND",
+        "bgutil_running": run(["pgrep", "-x", "bgutil-pot"]) != "ERROR: Command '['pgrep', '-x', 'bgutil-pot']' returned non-zero exit status 1.",
+        "ffmpeg": run(["ffmpeg", "-version"]).splitlines()[0] if shutil.which("ffmpeg") else "NOT FOUND",
+        "curl_cffi": curl_cffi_version,
+        "yt_dlp_plugins": plugins,
+        "cookies_file": COOKIES_FILE or "not set",
+        "download_dir": str(DOWNLOAD_DIR),
+    })
 
 
 @app.post("/api/download")
