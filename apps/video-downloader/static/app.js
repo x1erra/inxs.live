@@ -44,7 +44,7 @@ async function pollStatus(jobId) {
 
       setProgress(data.progress);
       const speed = data.speed ? ` | Speed: ${data.speed}` : "";
-      const eta = data.eta ? ` | ETA: ${data.eta}s` : "";
+      const eta = data.eta ? ` | ETA: ${data.eta}` : "";
       setStatus(`${data.message || data.status}${speed}${eta}`);
 
       if (data.status === "completed") {
