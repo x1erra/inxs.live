@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import shutil
@@ -20,6 +21,10 @@ except ImportError:
 BASE_DIR = Path(__file__).resolve().parent
 DOWNLOAD_DIR = Path(os.environ.get("DOWNLOAD_DIR", str(Path.home() / "Downloads"))).expanduser()
 DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+JOB_STATE_DIR = Path(
+    os.environ.get("JOB_STATE_DIR", str(DOWNLOAD_DIR.parent / ".video-downloader-jobs"))
+).expanduser()
+JOB_STATE_DIR.mkdir(parents=True, exist_ok=True)
 OPEN_DOWNLOADS_ENABLED = os.environ.get("ENABLE_OPEN_DOWNLOADS", "").lower() in {"1", "true", "yes"}
 COOKIES_FILE = os.environ.get("COOKIES_FILE", "").strip() or None
 
@@ -32,6 +37,11 @@ jobs_lock = threading.Lock()
 URL_PATTERN = re.compile(r"^https?://", re.IGNORECASE)
 
 
+def is_youtube_url(url: str) -> bool:
+    lowered = url.lower()
+    return "youtube.com/" in lowered or "youtu.be/" in lowered
+
+
 def _safe_percent(value: str) -> float:
     if not value:
         return 0.0
@@ -42,20 +52,162 @@ def _safe_percent(value: str) -> float:
         return 0.0
 
 
+def _job_file(job_id: str) -> Path:
+    return JOB_STATE_DIR / f"{job_id}.json"
+
+
+def _load_job_from_disk(job_id: str):
+    path = _job_file(job_id)
+    if not path.exists():
+        return None
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    return payload if isinstance(payload, dict) else None
+
+
+def _persist_job(job_id: str, job: dict):
+    path = _job_file(job_id)
+    temp_path = path.with_suffix(".json.tmp")
+    temp_path.write_text(json.dumps(job), encoding="utf-8")
+    temp_path.replace(path)
+
+
+def _cleanup_stale_jobs(now: int):
+    stale_memory_ids = [
+        jid for jid, job in jobs.items()
+        if job.get("status") in ("completed", "error")
+        and now - int(job.get("completed_at") or job.get("created_at") or now) > JOB_TTL_SECONDS
+    ]
+
+    for jid in stale_memory_ids:
+        jobs.pop(jid, None)
+
+    for path in JOB_STATE_DIR.glob("*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        completed_or_created = int(payload.get("completed_at") or payload.get("created_at") or now)
+        if payload.get("status") in ("completed", "error") and now - completed_or_created > JOB_TTL_SECONDS:
+            try:
+                path.unlink()
+            except OSError:
+                pass
+
+
 def _set_job(job_id: str, **updates):
+    disk_job = _load_job_from_disk(job_id) or {}
+
     with jobs_lock:
-        job = jobs.get(job_id, {})
+        job = dict(disk_job)
+        job.update(jobs.get(job_id, {}))
         job.update(updates)
+        job.setdefault("job_id", job_id)
+        job.setdefault("created_at", int(time.time()))
         jobs[job_id] = job
-        # Evict old completed/errored jobs to prevent unbounded memory growth.
         now = int(time.time())
-        stale = [
-            jid for jid, j in jobs.items()
-            if j.get("status") in ("completed", "error")
-            and now - int(j.get("completed_at") or j.get("created_at") or now) > JOB_TTL_SECONDS
-        ]
-        for jid in stale:
-            jobs.pop(jid, None)
+        _persist_job(job_id, job)
+        _cleanup_stale_jobs(now)
+
+
+def _get_job(job_id: str):
+    with jobs_lock:
+        in_memory = jobs.get(job_id)
+        if in_memory:
+            return dict(in_memory)
+
+    job = _load_job_from_disk(job_id)
+    if not job:
+        return None
+
+    with jobs_lock:
+        jobs[job_id] = job
+
+    return dict(job)
+
+
+def _resolve_output_file(filename: str, format_choice: str, info: dict):
+    if os.path.exists(filename):
+        return filename
+
+    base = os.path.splitext(filename)[0]
+    matches = list(Path(base).parent.glob(Path(base).name + ".*"))
+
+    if format_choice == "mp3":
+        mp3_matches = [p for p in matches if p.suffix.lower() == ".mp3"]
+        if mp3_matches:
+            return str(mp3_matches[0])
+
+    if matches:
+        return str(matches[0])
+
+    video_id = info.get("id")
+    if video_id:
+        fallback_matches = sorted(
+            DOWNLOAD_DIR.glob(f"{video_id}_*"),
+            key=lambda path: path.stat().st_mtime if path.exists() else 0,
+            reverse=True,
+        )
+        if format_choice == "mp3":
+            mp3_matches = [path for path in fallback_matches if path.suffix.lower() == ".mp3"]
+            if mp3_matches:
+                return str(mp3_matches[0])
+        if fallback_matches:
+            return str(fallback_matches[0])
+
+    return filename
+
+
+def _resolve_job_file(job: dict):
+    file_path_value = job.get("file_path")
+    downloads_root = DOWNLOAD_DIR.resolve()
+
+    if file_path_value:
+        file_path = Path(file_path_value).resolve()
+        if str(file_path).startswith(str(downloads_root)) and file_path.exists():
+            return file_path
+
+    video_id = job.get("video_id")
+    if video_id:
+        matches = sorted(
+            DOWNLOAD_DIR.glob(f"{video_id}_*"),
+            key=lambda path: path.stat().st_mtime if path.exists() else 0,
+            reverse=True,
+        )
+        if matches:
+            return matches[0].resolve()
+
+    return None
+
+
+def _run_download_attempt(job_id: str, url: str, ydl_opts: dict):
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        _set_job(
+            job_id,
+            status="initializing",
+            progress=0.0,
+            speed="",
+            eta="",
+            message="Fetching metadata...",
+        )
+        info = ydl.extract_info(url, download=False)
+        _set_job(
+            job_id,
+            status="starting",
+            progress=0.0,
+            title=info.get("title", "Untitled"),
+            video_id=info.get("id"),
+            extractor=info.get("extractor_key", "Unknown"),
+            message="Starting download...",
+        )
+        ydl.process_ie_result(info, download=True)
+        filename = ydl.prepare_filename(info)
+        return info, filename
 
 
 class _CapturingLogger:
@@ -90,7 +242,7 @@ def _download_worker(job_id: str, url: str, format_choice: str):
         if status == "downloading":
             percent = _safe_percent(data.get("_percent_str", "0"))
             speed = (data.get("_speed_str") or "").strip()
-            eta = str(data.get("eta") or "").strip()
+            eta = (data.get("_eta_str") or str(data.get("eta") or "")).strip()
             _set_job(
                 job_id,
                 status="downloading",
@@ -105,11 +257,14 @@ def _download_worker(job_id: str, url: str, format_choice: str):
     ydl_opts = {
         "outtmpl": output_template,
         "progress_hooks": [progress_hook],
+        "continuedl": True,
+        "fragment_retries": 10,
         "noplaylist": True,
         "quiet": True,
         "no_warnings": False,
         "verbose": True,
         "logger": logger,
+        "retries": 10,
         "restrictfilenames": False,
     }
 
@@ -140,49 +295,69 @@ def _download_worker(job_id: str, url: str, format_choice: str):
     elif format_choice == "mp4":
         ydl_opts.update(
             {
-                # Prefer MP4 files that already include audio, then fallback to any format with audio.
-                "format": "best[ext=mp4][acodec!=none]/best[acodec!=none]/best",
+                "format": "bestvideo[vcodec^=avc1]+bestaudio[acodec^=mp4a]/best[ext=mp4]/best",
+                "merge_output_format": "mp4",
             }
         )
     else:
-        ydl_opts.update({"format": "bestvideo*+bestaudio/best"})
+        ydl_opts.update({"format": "bestvideo+bestaudio/best"})
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            filename = ydl.prepare_filename(info)
+        attempt_opts = [ydl_opts]
 
-            # yt-dlp may change extension after post-processing.
-            base = os.path.splitext(filename)[0]
-            if format_choice == "mp3":
-                mp3_file = Path(base + ".mp3")
-                if mp3_file.exists():
-                    filename = str(mp3_file)
-                else:
-                    matches = list(Path(base).parent.glob(Path(base).name + ".*"))
-                    mp3_matches = [p for p in matches if p.suffix.lower() == ".mp3"]
-                    if mp3_matches:
-                        filename = str(mp3_matches[0])
-                    elif matches:
-                        filename = str(matches[0])
-            elif not os.path.exists(filename):
-                matches = list(Path(base).parent.glob(Path(base).name + ".*"))
-                if matches:
-                    filename = str(matches[0])
+        if is_youtube_url(url):
+            fallback_opts = dict(ydl_opts)
+            fallback_opts["extractor_args"] = {
+                "youtube": {
+                    "player_client": ["web"],
+                    "formats": ["incomplete"],
+                }
+            }
+            attempt_opts.append(fallback_opts)
 
-            _set_job(
-                job_id,
-                status="completed",
-                progress=100.0,
-                speed="",
-                eta="",
-                message="Download complete",
-                file_path=filename,
-                title=info.get("title", "Untitled"),
-                extractor=info.get("extractor_key", "Unknown"),
-                selected_format=format_choice,
-                completed_at=int(time.time()),
-            )
+        info = None
+        filename = None
+        last_error = None
+
+        for attempt_index, current_opts in enumerate(attempt_opts):
+            try:
+                info, filename = _run_download_attempt(job_id, url, current_opts)
+                break
+            except Exception as exc:
+                last_error = exc
+
+                if attempt_index == len(attempt_opts) - 1:
+                    raise
+
+                _set_job(
+                    job_id,
+                    status="retrying",
+                    progress=0.0,
+                    speed="",
+                    eta="",
+                    message="Retrying extractor...",
+                )
+
+        if info is None or filename is None:
+            raise last_error or RuntimeError("Download failed")
+
+        filename = _resolve_output_file(filename, format_choice, info)
+
+        _set_job(
+            job_id,
+            status="completed",
+            progress=100.0,
+            speed="",
+            eta="",
+            message="Download complete",
+            file_path=filename,
+            file_name=Path(filename).name,
+            title=info.get("title", "Untitled"),
+            video_id=info.get("id"),
+            extractor=info.get("extractor_key", "Unknown"),
+            selected_format=format_choice,
+            completed_at=int(time.time()),
+        )
     except Exception as exc:
         _set_job(job_id, status="error", error=str(exc), message="Download failed",
                  debug_log="\n".join(logger.lines[-80:]))
@@ -302,9 +477,7 @@ def start_download():
 
 @app.get("/api/status/<job_id>")
 def get_status(job_id: str):
-    with jobs_lock:
-        job = jobs.get(job_id)
-
+    job = _get_job(job_id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
 
@@ -313,17 +486,16 @@ def get_status(job_id: str):
 
 @app.get("/api/file/<job_id>")
 def get_file(job_id: str):
-    with jobs_lock:
-        job = jobs.get(job_id)
-
+    job = _get_job(job_id)
     if not job or job.get("status") != "completed":
         return abort(404)
 
-    file_path = Path(job.get("file_path", "")).resolve()
-    downloads_root = DOWNLOAD_DIR.resolve()
-
-    if not str(file_path).startswith(str(downloads_root)) or not file_path.exists():
+    file_path = _resolve_job_file(job)
+    if file_path is None:
         return abort(404)
+
+    if job.get("file_path") != str(file_path):
+        _set_job(job_id, file_path=str(file_path), file_name=file_path.name)
 
     return send_file(file_path, as_attachment=True)
 
