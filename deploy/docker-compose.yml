@@ -1,18 +1,4 @@
 services:
-  pdf-docs:
-    build:
-      context: ../apps/pdf-docs
-    container_name: inxs-pdf-docs
-    restart: unless-stopped
-    ports:
-      - "18000:8000"
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   video-converter:
     build:
       context: ../apps/video-converter
@@ -63,7 +49,6 @@ services:
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
-      - pdf-docs
       - video-converter
       - video-downloader
 
